@@ -288,17 +288,22 @@ main{flex:1 1 auto;overflow-y:auto;padding:12px 12px 90px;}
 .drawer-body{flex:1;overflow-y:auto;padding:8px 0;}
 
 .slrow{
-  display:flex;align-items:center;gap:10px;padding:11px 18px;border-bottom:1px solid var(--border);
+  padding:11px 18px;border-bottom:1px solid var(--border);
 }
+.slrow.open{background:var(--bg-elev);}
+.slrow-head{display:flex;align-items:flex-start;gap:10px;}
 .slrow-main{flex:1;min-width:0;}
-.slrow-name{font-size:14px;font-weight:700;letter-spacing:0;}
+.slrow-name{font-size:14px;font-weight:700;letter-spacing:0;overflow-wrap:anywhere;}
 .slrow-sub{font-size:12px;color:var(--text-dim);margin-top:2px;}
 .slrow-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;}
 .slrow-tags .tastetag{font-size:10.5px;padding:2px 7px;}
+.slrow-side{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:0 0 auto;}
 .slrow-price{font-weight:800;font-size:14.5px;white-space:nowrap;}
 .slrow-remove{
-  background:none;border:0;color:var(--text-faint);font-size:20px;cursor:pointer;padding:4px 6px;flex:0 0 auto;
+  background:none;border:0;color:var(--text-faint);font-size:20px;cursor:pointer;padding:0 4px;flex:0 0 auto;line-height:1;
 }
+.slrow .ficha-link{margin-top:4px;padding:4px 2px;}
+.slrow.open .card-expand{max-height:520px;margin-top:4px;}
 .drawer-footer{
   flex:0 0 auto;padding:12px 18px calc(14px + env(safe-area-inset-bottom));
   border-top:1px solid var(--border);display:flex;gap:10px;
@@ -479,6 +484,7 @@ const state = {
   hideUnavailable: true,
   shortlist: new Set(),
   openCard: null,
+  openSlRow: null,
 };
 
 // ---------- helpers ----------
@@ -699,6 +705,19 @@ function grapeTagsHtml(w){
   return w.uvasTags.slice(0,6).map(g=>`<span class="grapetag">${g}</span>`).join("");
 }
 
+// Shared ficha body — used by both the card expand panel and the shortlist
+// drawer, so "review the grapes / sommelier notes" works the same in both.
+function fichaBodyHtml(w){
+  const flag = flagFor(w.pais);
+  return `
+    <div class="expand-row"><div class="expand-label">País / Año</div>${flag?flag+" ":""}${w.pais||"—"} · ${w.anio||"—"} · ${w.tamano||"75cl"}</div>
+    <div class="expand-row"><div class="expand-label">Etiquetas de cata</div><div class="tagline" style="margin-top:5px;">${tasteTagsHtml(w)}</div></div>
+    <div class="expand-row"><div class="expand-label">Uva</div><div class="tagline" style="margin-top:5px;">${grapeTagsHtml(w)}</div><div style="margin-top:5px;">${w.uva || "No especificada en la ficha original."}</div></div>
+    <div class="expand-row"><div class="expand-label">Notas del sumiller</div>${w.notas || (w.notasSinDatos ? "Esta ficha aún no tiene notas de cata registradas." : "—")}</div>
+    <div class="expand-row"><div class="expand-label">Coste / Precio</div>Coste ${w.coste!=null?fmtPrice(w.coste)+" €":"—"} · PVP ${fmtPrice(w.precio)} €</div>
+  `;
+}
+
 function cardHtml(w){
   const s = stockInfo(w.stock);
   const inList = state.shortlist.has(w.id);
@@ -725,13 +744,7 @@ function cardHtml(w){
       <button class="select-chip ${inList?'active':''}" data-shortlist="${w.id}">${inList? "✓ Seleccionado" : "Seleccionar +"}</button>
     </div>
     <div class="card-expand">
-      <div class="expand-inner">
-        <div class="expand-row"><div class="expand-label">País / Año</div>${flag?flag+" ":""}${w.pais||"—"} · ${w.anio||"—"} · ${w.tamano||"75cl"}</div>
-        <div class="expand-row"><div class="expand-label">Etiquetas de cata</div><div class="tagline" style="margin-top:5px;">${tasteTagsHtml(w)}</div></div>
-        <div class="expand-row"><div class="expand-label">Uva</div><div class="tagline" style="margin-top:5px;">${grapeTagsHtml(w)}</div><div style="margin-top:5px;">${w.uva || "No especificada en la ficha original."}</div></div>
-        <div class="expand-row"><div class="expand-label">Notas del sumiller</div>${w.notas || (w.notasSinDatos ? "Esta ficha aún no tiene notas de cata registradas." : "—")}</div>
-        <div class="expand-row"><div class="expand-label">Coste / Precio</div>Coste ${w.coste!=null?fmtPrice(w.coste)+" €":"—"} · PVP ${fmtPrice(w.precio)} €</div>
-      </div>
+      <div class="expand-inner">${fichaBodyHtml(w)}</div>
     </div>
   </div>`;
 }
@@ -799,25 +812,44 @@ function renderShortlistDrawer(){
   const body = document.getElementById("shortlistBody");
   const items = WINES.filter(w=>state.shortlist.has(w.id));
   if(!items.length){
-    body.innerHTML = `<div class="sl-empty">Aún no has añadido vinos. Toca el botón “＋” en una ficha para guardarla aquí.</div>`;
+    body.innerHTML = `<div class="sl-empty">Aún no has añadido vinos. Toca “Seleccionar +” en una ficha para guardarla aquí.</div>`;
     return;
   }
-  body.innerHTML = items.map(w=>`
-    <div class="slrow">
-      <div class="slrow-main">
-        <div class="slrow-name">${w.nombre}</div>
-        <div class="slrow-sub">${w.productora||"Productor sin especificar"}</div>
-        <div class="slrow-tags">${tasteTagsHtml(w)}</div>
+  body.innerHTML = items.map(w=>{
+    const open = state.openSlRow===w.id;
+    return `
+    <div class="slrow ${open?'open':''}" data-slid="${w.id}">
+      <div class="slrow-head">
+        <div class="slrow-main">
+          <div class="slrow-name">${w.nombre}</div>
+          <div class="slrow-sub">${w.productora||"Productor sin especificar"}</div>
+          <div class="slrow-tags">${tasteTagsHtml(w)}</div>
+        </div>
+        <div class="slrow-side">
+          <div class="slrow-price">${fmtPrice(w.precio)} €</div>
+          <button class="slrow-remove" data-remove="${w.id}" aria-label="Quitar de la shortlist">×</button>
+        </div>
       </div>
-      <div class="slrow-price">${fmtPrice(w.precio)} €</div>
-      <button class="slrow-remove" data-remove="${w.id}">×</button>
-    </div>`).join("");
+      <button class="ficha-link" data-sltoggle="${w.id}">${open?"Ocultar ficha ▲":"Ver ficha (uva, notas del sumiller) →"}</button>
+      <div class="card-expand">
+        <div class="expand-inner">${fichaBodyHtml(w)}</div>
+      </div>
+    </div>`;
+  }).join("");
   body.querySelectorAll("[data-remove]").forEach(el=>{
-    el.addEventListener("click", ()=>{
+    el.addEventListener("click", (ev)=>{
+      ev.stopPropagation();
       state.shortlist.delete(Number(el.dataset.remove));
       updateShortlistUI();
       renderShortlistDrawer();
       renderList();
+    });
+  });
+  body.querySelectorAll("[data-sltoggle]").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      const id = Number(el.dataset.sltoggle);
+      state.openSlRow = state.openSlRow===id ? null : id;
+      renderShortlistDrawer();
     });
   });
 }
