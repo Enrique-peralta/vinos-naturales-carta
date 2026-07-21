@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Carta de vinos naturales</title>
+<style>
+:root{
+  --bg:#121317;
+  --bg-elev:#1b1d23;
+  --bg-elev-2:#23262e;
+  --border:#33363f;
+  --text:#f1efe9;
+  --text-dim:#a7a6ae;
+  --text-faint:#71707a;
+  --accent:#c9536a;
+  --accent-soft:rgba(201,83,106,0.16);
+  --accent-strong:#e0708a;
+  --good:#6fae7c;
+  --warn:#d9a441;
+  --bad:#c9536a;
+  --radius:14px;
+  --radius-sm:9px;
+  font-size:16px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overscroll-behavior-y:none;
+}
+button{font-family:inherit;}
+.app{display:flex;flex-direction:column;height:100vh;height:100dvh;}
+
+/* HEADER */
+header{
+  flex:0 0 auto;
+  padding:12px 14px 10px;
+  background:var(--bg);
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:20;
+}
+.header-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.title{font-size:17px;font-weight:700;letter-spacing:.2px;flex:1;min-width:0;}
+.title small{display:block;font-weight:400;color:var(--text-dim);font-size:12px;margin-top:1px;}
+.count-pill{
+  background:var(--bg-elev-2);border:1px solid var(--border);color:var(--text-dim);
+  font-size:12px;padding:5px 10px;border-radius:20px;white-space:nowrap;
+}
+
+.searchbar{
+  display:flex;align-items:center;gap:8px;
+  background:var(--bg-elev);border:1px solid var(--border);
+  border-radius:var(--radius);padding:10px 12px;
+}
+.searchbar svg{flex:0 0 auto;opacity:.6;}
+.searchbar input{
+  flex:1;background:transparent;border:0;outline:0;color:var(--text);
+  font-size:16px;min-width:0;
+}
+.searchbar input::placeholder{color:var(--text-faint);}
+.clear-btn{
+  background:none;border:0;color:var(--text-faint);font-size:20px;line-height:1;
+  padding:4px 6px;cursor:pointer;display:none;
+}
+.clear-btn.show{display:block;}
+
+.chiprow{
+  display:flex;gap:8px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none;
+}
+.chiprow::-webkit-scrollbar{display:none;}
+.chip{
+  flex:0 0 auto;padding:8px 14px;border-radius:20px;border:1px solid var(--border);
+  background:var(--bg-elev);color:var(--text-dim);font-size:13.5px;font-weight:600;
+  cursor:pointer;white-space:nowrap;user-select:none;
+}
+.chip.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.chip .n{opacity:.65;font-weight:400;margin-left:3px;}
+.chip.active .n{opacity:.85;}
+
+.filter-toggle-row{display:flex;gap:8px;margin-top:8px;align-items:center;}
+.filter-toggle{
+  display:flex;align-items:center;gap:6px;
+  background:var(--bg-elev);border:1px solid var(--border);color:var(--text);
+  padding:8px 13px;border-radius:20px;font-size:13.5px;font-weight:600;cursor:pointer;
+}
+.filter-toggle.has-active{border-color:var(--accent);color:var(--accent-strong);}
+.badge-dot{
+  background:var(--accent);color:#fff;border-radius:10px;font-size:11px;
+  padding:1px 6px;font-weight:700;
+}
+.avail-toggle{
+  display:flex;align-items:center;gap:6px;color:var(--text-dim);font-size:12.5px;
+  margin-left:auto;user-select:none;cursor:pointer;
+}
+.avail-toggle input{accent-color:var(--accent);width:15px;height:15px;}
+
+/* FILTER PANEL */
+.filter-panel{
+  position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:40;
+  display:none;
+}
+.filter-panel.open{display:block;}
+.filter-sheet{
+  position:absolute;bottom:0;left:0;right:0;max-height:86vh;
+  background:var(--bg-elev);border-radius:20px 20px 0 0;
+  display:flex;flex-direction:column;
+  animation:slideup .18s ease-out;
+}
+@keyframes slideup{from{transform:translateY(20px);opacity:.4;}to{transform:translateY(0);opacity:1;}}
+.filter-sheet-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 18px 10px;border-bottom:1px solid var(--border);flex:0 0 auto;
+}
+.filter-sheet-header h2{font-size:16px;margin:0;}
+.filter-sheet-header button{
+  background:none;border:0;color:var(--text-dim);font-size:14px;cursor:pointer;padding:6px;
+}
+.filter-sheet-body{overflow-y:auto;padding:14px 18px 10px;flex:1 1 auto;}
+.filter-group{margin-bottom:20px;}
+.filter-group-title{font-size:13px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:9px;display:flex;align-items:center;justify-content:space-between;}
+.filter-group-title .reset-mini{font-size:11.5px;text-transform:none;font-weight:600;color:var(--accent-strong);letter-spacing:0;cursor:pointer;}
+.tagwrap{display:flex;flex-wrap:wrap;gap:7px;}
+.tagbtn{
+  padding:7px 12px;border-radius:16px;border:1px solid var(--border);
+  background:var(--bg-elev-2);color:var(--text-dim);font-size:13px;cursor:pointer;
+}
+.tagbtn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-strong);}
+.mini-search{
+  width:100%;padding:9px 11px;border-radius:9px;border:1px solid var(--border);
+  background:var(--bg-elev-2);color:var(--text);font-size:14px;margin-bottom:9px;outline:0;
+}
+.price-row{display:flex;align-items:center;gap:10px;}
+.price-input{
+  flex:1;padding:9px 10px;border-radius:9px;border:1px solid var(--border);
+  background:var(--bg-elev-2);color:var(--text);font-size:14px;outline:0;width:100%;
+}
+.price-sep{color:var(--text-faint);font-size:13px;}
+.price-hint{font-size:11.5px;color:var(--text-faint);margin-top:6px;}
+.region-list{max-height:230px;overflow-y:auto;border:1px solid var(--border);border-radius:10px;}
+.region-item{
+  display:flex;align-items:center;gap:9px;padding:9px 12px;font-size:13.5px;
+  border-bottom:1px solid var(--border);cursor:pointer;color:var(--text-dim);
+}
+.region-item:last-child{border-bottom:0;}
+.region-item input{accent-color:var(--accent);width:16px;height:16px;flex:0 0 auto;}
+.region-item.checked{color:var(--text);background:var(--accent-soft);}
+.filter-sheet-footer{
+  flex:0 0 auto;padding:12px 18px calc(14px + env(safe-area-inset-bottom));
+  border-top:1px solid var(--border);display:flex;gap:10px;
+}
+.btn{
+  flex:1;padding:13px;border-radius:12px;border:0;font-size:14.5px;font-weight:700;cursor:pointer;
+}
+.btn-ghost{background:var(--bg-elev-2);color:var(--text-dim);border:1px solid var(--border);}
+.btn-primary{background:var(--accent);color:#fff;}
+
+/* LIST */
+main{flex:1 1 auto;overflow-y:auto;padding:12px 12px 90px;}
+.empty-state{
+  text-align:center;padding:60px 20px;color:var(--text-dim);
+}
+.empty-state .glyph{font-size:34px;margin-bottom:10px;}
+.empty-state p{margin:4px 0;font-size:14px;}
+.empty-state button{margin-top:14px;background:var(--accent-soft);color:var(--accent-strong);border:1px solid var(--accent);padding:9px 16px;border-radius:10px;font-size:13.5px;font-weight:600;}
+
+.card{
+  background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius);
+  padding:13px 13px 12px;margin-bottom:10px;position:relative;
+}
+.card-top{display:flex;gap:10px;align-items:flex-start;}
+.card-main{flex:1;min-width:0;}
+.card-name{font-size:15.5px;font-weight:700;line-height:1.28;}
+.card-producer{font-size:13px;color:var(--text-dim);margin-top:2px;}
+.card-meta{display:flex;flex-wrap:wrap;gap:5px 8px;margin-top:6px;font-size:12px;color:var(--text-faint);align-items:center;}
+.dot-sep::before{content:"·";margin-right:8px;color:var(--text-faint);}
+.cat-pill{
+  font-size:11px;font-weight:700;padding:2px 8px;border-radius:8px;
+  background:var(--bg-elev-2);color:var(--text-dim);letter-spacing:.2px;
+}
+.card-price{font-size:16px;font-weight:800;color:var(--text);white-space:nowrap;text-align:right;}
+.card-price .cur{font-size:11px;font-weight:600;color:var(--text-faint);}
+
+.shortlist-btn{
+  flex:0 0 auto;width:38px;height:38px;border-radius:10px;border:1px solid var(--border);
+  background:var(--bg-elev-2);display:flex;align-items:center;justify-content:center;cursor:pointer;
+  color:var(--text-faint);
+}
+.shortlist-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+.tagline{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.tastetag{
+  font-size:11.5px;padding:4px 9px;border-radius:8px;background:var(--accent-soft);color:var(--accent-strong);font-weight:600;
+}
+.tastetag.empty{background:transparent;border:1px dashed var(--border);color:var(--text-faint);font-weight:500;}
+.grapetag{
+  font-size:11.5px;padding:4px 9px;border-radius:8px;background:var(--bg-elev-2);color:var(--text-dim);border:1px solid var(--border);
+}
+.grapetag.unconfirmed{border-style:dashed;color:var(--text-faint);}
+
+.stock-tag{font-size:11px;font-weight:700;padding:3px 8px;border-radius:7px;display:inline-flex;align-items:center;gap:5px;}
+.stock-tag::before{content:"";width:6px;height:6px;border-radius:50%;}
+.stock-ok{background:rgba(111,174,124,.15);color:var(--good);}
+.stock-ok::before{background:var(--good);}
+.stock-low{background:rgba(217,164,65,.15);color:var(--warn);}
+.stock-low::before{background:var(--warn);}
+.stock-out{background:rgba(201,83,106,.15);color:var(--bad);}
+.stock-out::before{background:var(--bad);}
+.stock-check{background:rgba(217,164,65,.15);color:var(--warn);}
+.stock-check::before{background:var(--warn);}
+
+.card-expand{
+  margin-top:0;max-height:0;overflow:hidden;transition:max-height .22s ease;
+}
+.card.open .card-expand{max-height:520px;margin-top:10px;}
+.expand-inner{border-top:1px solid var(--border);padding-top:10px;font-size:13px;color:var(--text-dim);line-height:1.55;}
+.expand-row{margin-bottom:8px;}
+.expand-label{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--text-faint);font-weight:700;margin-bottom:2px;}
+.expand-flag{
+  display:inline-block;margin-top:4px;font-size:11.5px;color:var(--warn);background:rgba(217,164,65,.12);
+  padding:3px 8px;border-radius:7px;
+}
+.tap-hint{text-align:center;margin-top:8px;}
+.tap-hint button{
+  background:none;border:0;color:var(--text-faint);font-size:11.5px;cursor:pointer;padding:4px;
+}
+
+/* SHORTLIST FAB + DRAWER */
+.fab{
+  position:fixed;left:14px;right:14px;bottom:14px;z-index:30;
+  background:var(--accent);color:#fff;border:0;border-radius:16px;
+  padding:14px 18px;font-size:14.5px;font-weight:700;display:none;
+  align-items:center;justify-content:space-between;box-shadow:0 8px 24px rgba(0,0,0,.4);
+  cursor:pointer;
+}
+.fab.show{display:flex;}
+.fab .fab-count{background:rgba(255,255,255,.25);border-radius:20px;padding:2px 10px;font-size:13px;}
+
+.drawer{
+  position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:50;display:none;
+}
+.drawer.open{display:block;}
+.drawer-sheet{
+  position:absolute;bottom:0;left:0;right:0;top:8vh;
+  background:var(--bg-elev);border-radius:20px 20px 0 0;display:flex;flex-direction:column;
+  animation:slideup .18s ease-out;
+}
+.drawer-header{
+  display:flex;align-items:center;justify-content:space-between;padding:16px 18px 12px;
+  border-bottom:1px solid var(--border);flex:0 0 auto;
+}
+.drawer-header h2{font-size:16.5px;margin:0;}
+.drawer-header button{background:none;border:0;color:var(--text-dim);font-size:14px;cursor:pointer;padding:6px;}
+.drawer-body{flex:1;overflow-y:auto;padding:8px 0;}
+
+.slrow{
+  display:flex;align-items:center;gap:10px;padding:11px 18px;border-bottom:1px solid var(--border);
+}
+.slrow-main{flex:1;min-width:0;}
+.slrow-name{font-size:14px;font-weight:700;}
+.slrow-sub{font-size:12px;color:var(--text-dim);margin-top:2px;}
+.slrow-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;}
+.slrow-tags .tastetag{font-size:10.5px;padding:2px 7px;}
+.slrow-price{font-weight:800;font-size:14.5px;white-space:nowrap;}
+.slrow-remove{
+  background:none;border:0;color:var(--text-faint);font-size:20px;cursor:pointer;padding:4px 6px;flex:0 0 auto;
+}
+.drawer-footer{
+  flex:0 0 auto;padding:12px 18px calc(14px + env(safe-area-inset-bottom));
+  border-top:1px solid var(--border);display:flex;gap:10px;
+}
+.sl-empty{padding:50px 20px;text-align:center;color:var(--text-dim);font-size:13.5px;}
+
+.toast{
+  position:fixed;left:50%;bottom:90px;transform:translateX(-50%);
+  background:var(--bg-elev-2);border:1px solid var(--border);color:var(--text);
+  padding:9px 16px;border-radius:20px;font-size:13px;z-index:60;opacity:0;
+  transition:opacity .2s ease;pointer-events:none;
+}
+.toast.show{opacity:1;}
+
+@media (min-width:720px){
+  main{padding:16px 20px 90px;}
+  .card-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;align-content:start;}
+  .fab{left:auto;width:260px;right:20px;bottom:20px;}
+  .filter-sheet,.drawer-sheet{max-width:520px;margin:0 auto;right:0;border-radius:20px;top:5vh;bottom:5vh;left:0;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="header-top">
+      <div class="title">Carta de vinos naturales<small>Selección para sala · solo lectura</small></div>
+      <div class="count-pill" id="resultCount">…</div>
+    </div>
+
+    <div class="searchbar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input id="searchInput" type="text" placeholder="Buscar vino o productor… (tolera errores)" autocomplete="off" autocorrect="off" spellcheck="false">
+      <button class="clear-btn" id="clearSearch">×</button>
+    </div>
+
+    <div class="chiprow" id="categoryChips"></div>
+
+    <div class="filter-toggle-row">
+      <button class="filter-toggle" id="openFilters">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Filtros
+        <span class="badge-dot" id="filterCountBadge" style="display:none;">0</span>
+      </button>
+      <label class="avail-toggle">
+        <input type="checkbox" id="hideUnavailable" checked>
+        Solo disponibles
+      </label>
+    </div>
+  </header>
+
+  <main>
+    <div id="listWrap"></div>
+  </main>
+
+  <button class="fab" id="fabShortlist">
+    <span>📋 Ver shortlist</span>
+    <span class="fab-count" id="fabCount">0</span>
+  </button>
+</div>
+
+<!-- FILTER PANEL -->
+<div class="filter-panel" id="filterPanel">
+  <div class="filter-sheet">
+    <div class="filter-sheet-header">
+      <h2>Filtros</h2>
+      <button id="closeFilters">Cerrar</button>
+    </div>
+    <div class="filter-sheet-body">
+
+      <div class="filter-group">
+        <div class="filter-group-title">Precio (€)<span class="reset-mini" id="resetPrice">quitar</span></div>
+        <div class="price-row">
+          <input type="number" class="price-input" id="priceMin" placeholder="min">
+          <span class="price-sep">—</span>
+          <input type="number" class="price-input" id="priceMax" placeholder="max">
+        </div>
+        <div class="price-hint" id="priceHint"></div>
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-group-title">Etiquetas de cata<span class="reset-mini" id="resetTaste">quitar</span></div>
+        <div class="tagwrap" id="tasteTags"></div>
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-group-title">Región<span class="reset-mini" id="resetRegion">quitar</span></div>
+        <input type="text" class="mini-search" id="regionSearch" placeholder="Buscar región…">
+        <div class="region-list" id="regionList"></div>
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-group-title">Uva<span class="reset-mini" id="resetGrape">quitar</span></div>
+        <input type="text" class="mini-search" id="grapeSearch" placeholder="Buscar uva…">
+        <div class="tagwrap" id="grapeTags"></div>
+      </div>
+
+    </div>
+    <div class="filter-sheet-footer">
+      <button class="btn btn-ghost" id="clearAllFilters">Limpiar todo</button>
+      <button class="btn btn-primary" id="applyFilters">Ver resultados</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHORTLIST DRAWER -->
+<div class="drawer" id="shortlistDrawer">
+  <div class="drawer-sheet">
+    <div class="drawer-header">
+      <h2>Shortlist</h2>
+      <button id="closeDrawer">Cerrar</button>
+    </div>
+    <div class="drawer-body" id="shortlistBody"></div>
+    <div class="drawer-footer">
+      <button class="btn btn-ghost" id="clearShortlist">Vaciar</button>
+      <button class="btn btn-primary" id="copyShortlist">Copiar lista</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let WINES = [];
+
+const TASTE_TAGS_ORDER = ["Fresco","Mineral","Acídico","Afrutado","Eléctrico","Vibrante","Ligero","Con cuerpo","Cuerpo medio","Especiado","Tropical","Volátil"];
+const CATEGORY_ORDER = ["Blanco","Tinto","Orange","Burbujas","Rosado","Dulce","Sin alcohol"];
+
+// ---------- state ----------
+const state = {
+  query: "",
+  category: "Todos",
+  taste: new Set(),
+  regions: new Set(),
+  grapes: new Set(),
+  priceMin: null,
+  priceMax: null,
+  hideUnavailable: true,
+  shortlist: new Set(),
+  openCard: null,
+};
+
+// ---------- helpers ----------
+function normalize(s){
+  return (s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+}
+function levenshtein(a,b){
+  if(a===b) return 0;
+  const al=a.length, bl=b.length;
+  if(al===0) return bl;
+  if(bl===0) return al;
+  let prev = new Array(bl+1);
+  for(let j=0;j<=bl;j++) prev[j]=j;
+  for(let i=1;i<=al;i++){
+    let cur=[i];
+    for(let j=1;j<=bl;j++){
+      const cost = a[i-1]===b[j-1] ? 0 : 1;
+      cur[j] = Math.min(prev[j]+1, cur[j-1]+1, prev[j-1]+cost);
+    }
+    prev=cur;
+  }
+  return prev[bl];
+}
+function tokenFuzzyMatch(token, word){
+  if(!word || word.length<2) return false;
+  if(word.startsWith(token) || word.indexOf(token)!==-1) return true;
+  if(token.length>=4 && word.length>=4 && word.indexOf(token)===-1 && token.indexOf(word)!==-1) return true;
+  if(token.length<=2) return false; // too short to fuzzy-match reliably
+  const maxDist = token.length<=4?1:(token.length<=8?2:3);
+  return levenshtein(token,word)<=maxDist;
+}
+function wineHaystackWords(w){
+  if(!w._words){
+    const hay = normalize(w.nombre+" "+w.productora);
+    w._words = hay.split(/[^a-z0-9à-ú]+/i).filter(Boolean);
+    w._hay = hay;
+  }
+  return w;
+}
+function matchesQuery(w, query){
+  if(!query) return true;
+  wineHaystackWords(w);
+  const qTokens = normalize(query).split(/\s+/).filter(Boolean);
+  return qTokens.every(qt => w._hay.includes(qt) || w._words.some(word => tokenFuzzyMatch(qt, word)));
+}
+function fmtPrice(p){
+  return p==null ? "—" : p.toFixed(2).replace(".",",");
+}
+function stockInfo(stock){
+  if(stock.kind==="number"){
+    if(stock.value<=0) return {cls:"stock-out", label:"Agotado"};
+    if(stock.value<=2) return {cls:"stock-low", label:"Quedan "+stock.value};
+    return {cls:"stock-ok", label:stock.value+" uds"};
+  }
+  if(stock.kind==="consultar") return {cls:"stock-check", label:"Consultar"};
+  if(stock.kind==="no_vender") return {cls:"stock-out", label:"No disponible"};
+  return {cls:"stock-check", label:"Sin dato de stock"};
+}
+function isSellable(w){
+  const s = w.stock;
+  if(s.kind==="no_vender") return false;
+  if(s.kind==="number" && s.value<=0) return false;
+  return true;
+}
+
+// ---------- derived data ----------
+let allRegions = [], grapeCounts = {}, allGrapesSorted = [], topGrapes = [];
+let prices = [], priceFloor = 0, priceCeil = 0, categoryCounts = {};
+function computeDerived(){
+  allRegions = [...new Set(WINES.map(w=>w.regionNorm).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
+  grapeCounts = {};
+  WINES.forEach(w => w.uvasTags.forEach(g => grapeCounts[g]=(grapeCounts[g]||0)+1));
+  allGrapesSorted = Object.keys(grapeCounts).sort((a,b)=>grapeCounts[b]-grapeCounts[a]);
+  topGrapes = allGrapesSorted.slice(0,18);
+
+  prices = WINES.map(w=>w.precio).filter(p=>p!=null);
+  priceFloor = prices.length ? Math.floor(Math.min(...prices)) : 0;
+  priceCeil = prices.length ? Math.ceil(Math.max(...prices)) : 0;
+
+  categoryCounts = {};
+  WINES.forEach(w => categoryCounts[w.categoria]=(categoryCounts[w.categoria]||0)+1);
+}
+
+// ---------- filtering ----------
+function getFiltered(){
+  return WINES.filter(w=>{
+    if(state.hideUnavailable && !isSellable(w)) return false;
+    if(state.category!=="Todos" && w.categoria!==state.category) return false;
+    if(!matchesQuery(w, state.query)) return false;
+    if(state.taste.size){
+      const has = w.etiquetasCata.some(t=>state.taste.has(t));
+      if(!has) return false;
+    }
+    if(state.regions.size && !state.regions.has(w.regionNorm)) return false;
+    if(state.grapes.size){
+      const has = w.uvasTags.some(g=>state.grapes.has(g));
+      if(!has) return false;
+    }
+    if(state.priceMin!=null && (w.precio==null || w.precio<state.priceMin)) return false;
+    if(state.priceMax!=null && (w.precio==null || w.precio>state.priceMax)) return false;
+    return true;
+  });
+}
+
+// ---------- render: category chips ----------
+function renderCategoryChips(){
+  const wrap = document.getElementById("categoryChips");
+  const totalAvail = WINES.filter(w=>!state.hideUnavailable || isSellable(w)).length;
+  let html = `<div class="chip ${state.category==='Todos'?'active':''}" data-cat="Todos">Todos <span class="n">${totalAvail}</span></div>`;
+  CATEGORY_ORDER.forEach(cat=>{
+    const n = WINES.filter(w=>w.categoria===cat && (!state.hideUnavailable||isSellable(w))).length;
+    html += `<div class="chip ${state.category===cat?'active':''}" data-cat="${cat}">${cat} <span class="n">${n}</span></div>`;
+  });
+  wrap.innerHTML = html;
+  wrap.querySelectorAll(".chip").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      state.category = el.dataset.cat;
+      renderCategoryChips();
+      renderList();
+    });
+  });
+}
+
+// ---------- render: filter panel contents ----------
+function renderTasteTags(){
+  const wrap = document.getElementById("tasteTags");
+  wrap.innerHTML = TASTE_TAGS_ORDER.map(t=>{
+    const active = state.taste.has(t);
+    return `<div class="tagbtn ${active?'active':''}" data-tag="${t}">${t}</div>`;
+  }).join("");
+  wrap.querySelectorAll(".tagbtn").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      const t = el.dataset.tag;
+      if(state.taste.has(t)) state.taste.delete(t); else state.taste.add(t);
+      renderTasteTags();
+      updateFilterBadge();
+    });
+  });
+}
+
+function renderRegionList(filterText){
+  const wrap = document.getElementById("regionList");
+  const q = normalize(filterText||"");
+  const regs = allRegions.filter(r=>normalize(r).includes(q));
+  if(!regs.length){
+    wrap.innerHTML = `<div class="region-item" style="cursor:default;">Sin coincidencias</div>`;
+    return;
+  }
+  wrap.innerHTML = regs.map(r=>{
+    const checked = state.regions.has(r);
+    return `<label class="region-item ${checked?'checked':''}"><input type="checkbox" data-region="${r.replace(/"/g,'&quot;')}" ${checked?'checked':''}> ${r}</label>`;
+  }).join("");
+  wrap.querySelectorAll("input[data-region]").forEach(inp=>{
+    inp.addEventListener("change", ()=>{
+      const r = inp.dataset.region;
+      if(inp.checked) state.regions.add(r); else state.regions.delete(r);
+      inp.closest(".region-item").classList.toggle("checked", inp.checked);
+      updateFilterBadge();
+    });
+  });
+}
+
+function renderGrapeTags(filterText){
+  const wrap = document.getElementById("grapeTags");
+  const q = normalize(filterText||"");
+  let list = q ? allGrapesSorted.filter(g=>normalize(g).includes(q)).slice(0,40) : topGrapes;
+  wrap.innerHTML = list.map(g=>{
+    const active = state.grapes.has(g);
+    return `<div class="tagbtn ${active?'active':''}" data-grape="${g}">${g} <span style="opacity:.55">${grapeCounts[g]}</span></div>`;
+  }).join("");
+  wrap.querySelectorAll("[data-grape]").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      const g = el.dataset.grape;
+      if(state.grapes.has(g)) state.grapes.delete(g); else state.grapes.add(g);
+      renderGrapeTags(document.getElementById("grapeSearch").value);
+      updateFilterBadge();
+    });
+  });
+}
+
+function updateFilterBadge(){
+  let n = state.taste.size + state.regions.size + state.grapes.size;
+  if(state.priceMin!=null || state.priceMax!=null) n += 1;
+  const badge = document.getElementById("filterCountBadge");
+  const btn = document.getElementById("openFilters");
+  if(n>0){
+    badge.style.display="inline-block";
+    badge.textContent = n;
+    btn.classList.add("has-active");
+  } else {
+    badge.style.display="none";
+    btn.classList.remove("has-active");
+  }
+}
+
+// ---------- render: card list ----------
+function tasteTagsHtml(w){
+  if(!w.etiquetasCata.length){
+    return `<span class="tastetag empty">Sin etiqueta de cata todavía</span>`;
+  }
+  return w.etiquetasCata.map(t=>`<span class="tastetag">${t}</span>`).join("");
+}
+function grapeTagsHtml(w){
+  if(w.uvasRevisar || !w.uvasTags.length){
+    return `<span class="grapetag unconfirmed">Uva sin confirmar</span>`;
+  }
+  return w.uvasTags.slice(0,4).map(g=>`<span class="grapetag">${g}</span>`).join("");
+}
+
+function cardHtml(w){
+  const s = stockInfo(w.stock);
+  const inList = state.shortlist.has(w.id);
+  const open = state.openCard===w.id;
+  return `
+  <div class="card ${open?'open':''}" data-id="${w.id}">
+    <div class="card-top">
+      <div class="card-main" data-toggle="${w.id}">
+        <div class="card-name">${w.nombre}</div>
+        <div class="card-producer">${w.productora||"Productor sin especificar"}</div>
+        <div class="card-meta">
+          <span class="cat-pill">${w.categoria}</span>
+          <span class="dot-sep">${w.regionNorm||w.pais||"—"}</span>
+          <span class="dot-sep">${s.label}</span>
+        </div>
+        <div class="tagline">${tasteTagsHtml(w)}${grapeTagsHtml(w)}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+        <div class="card-price">${fmtPrice(w.precio)}<span class="cur"> €</span></div>
+        <button class="shortlist-btn ${inList?'active':''}" data-shortlist="${w.id}" aria-label="Añadir a shortlist">${inList? "✓" : "＋"}</button>
+      </div>
+    </div>
+    <div class="card-expand">
+      <div class="expand-inner">
+        <div class="expand-row"><div class="expand-label">País / Año</div>${w.pais||"—"} · ${w.anio||"—"} · ${w.tamano||"75cl"}</div>
+        <div class="expand-row"><div class="expand-label">Uva (nota original)</div>${w.uva || "No especificada en la ficha original."}</div>
+        <div class="expand-row"><div class="expand-label">Notas del sumiller</div>${w.notas || (w.notasSinDatos ? "Esta ficha aún no tiene notas de cata registradas." : "—")}</div>
+        <div class="expand-row"><div class="expand-label">Coste / Precio</div>Coste ${w.coste!=null?fmtPrice(w.coste)+" €":"—"} · PVP ${fmtPrice(w.precio)} €</div>
+      </div>
+    </div>
+    <div class="tap-hint"><button data-toggle="${w.id}">${open?"Ocultar detalle ▲":"Ver ficha completa ▼"}</button></div>
+  </div>`;
+}
+
+let renderLimit = 60;
+function renderList(){
+  const filtered = getFiltered();
+  document.getElementById("resultCount").textContent = filtered.length + (filtered.length===1?" vino":" vinos");
+  const wrap = document.getElementById("listWrap");
+  if(!filtered.length){
+    wrap.innerHTML = `
+      <div class="empty-state">
+        <div class="glyph">🍷</div>
+        <p><strong>Ningún vino coincide con estos filtros.</strong></p>
+        <p>Prueba a quitar alguno o ampliar la búsqueda.</p>
+        <button id="emptyReset">Limpiar filtros</button>
+      </div>`;
+    document.getElementById("emptyReset").addEventListener("click", clearAllFilters);
+    return;
+  }
+  const slice = filtered.slice(0, renderLimit);
+  let html = `<div class="card-list">` + slice.map(cardHtml).join("") + `</div>`;
+  if(filtered.length > renderLimit){
+    html += `<div style="text-align:center;padding:14px 0;"><button class="btn btn-ghost" id="loadMoreBtn" style="flex:none;padding:11px 22px;">Cargar más (${filtered.length - renderLimit} restantes)</button></div>`;
+  }
+  wrap.innerHTML = html;
+
+  wrap.querySelectorAll("[data-toggle]").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      const id = Number(el.dataset.toggle);
+      state.openCard = state.openCard===id ? null : id;
+      renderList();
+    });
+  });
+  wrap.querySelectorAll("[data-shortlist]").forEach(el=>{
+    el.addEventListener("click", (ev)=>{
+      ev.stopPropagation();
+      const id = Number(el.dataset.shortlist);
+      toggleShortlist(id);
+    });
+  });
+  const loadMore = document.getElementById("loadMoreBtn");
+  if(loadMore) loadMore.addEventListener("click", ()=>{ renderLimit += 60; renderList(); });
+}
+
+// ---------- shortlist ----------
+function toggleShortlist(id){
+  if(state.shortlist.has(id)){
+    state.shortlist.delete(id);
+    showToast("Quitado de la shortlist");
+  } else {
+    state.shortlist.add(id);
+    showToast("Añadido a la shortlist");
+  }
+  updateShortlistUI();
+  renderList();
+}
+function updateShortlistUI(){
+  const n = state.shortlist.size;
+  const fab = document.getElementById("fabShortlist");
+  document.getElementById("fabCount").textContent = n;
+  fab.classList.toggle("show", n>0);
+}
+function renderShortlistDrawer(){
+  const body = document.getElementById("shortlistBody");
+  const items = WINES.filter(w=>state.shortlist.has(w.id));
+  if(!items.length){
+    body.innerHTML = `<div class="sl-empty">Aún no has añadido vinos. Toca el botón “＋” en una ficha para guardarla aquí.</div>`;
+    return;
+  }
+  body.innerHTML = items.map(w=>`
+    <div class="slrow">
+      <div class="slrow-main">
+        <div class="slrow-name">${w.nombre}</div>
+        <div class="slrow-sub">${w.productora||"Productor sin especificar"}</div>
+        <div class="slrow-tags">${tasteTagsHtml(w)}</div>
+      </div>
+      <div class="slrow-price">${fmtPrice(w.precio)} €</div>
+      <button class="slrow-remove" data-remove="${w.id}">×</button>
+    </div>`).join("");
+  body.querySelectorAll("[data-remove]").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      state.shortlist.delete(Number(el.dataset.remove));
+      updateShortlistUI();
+      renderShortlistDrawer();
+      renderList();
+    });
+  });
+}
+
+// ---------- toast ----------
+let toastTimer=null;
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove("show"), 1400);
+}
+
+// ---------- filter panel open/close ----------
+function openFilterPanel(){
+  document.getElementById("filterPanel").classList.add("open");
+  renderRegionList(document.getElementById("regionSearch").value);
+  renderGrapeTags(document.getElementById("grapeSearch").value);
+}
+function closeFilterPanel(){
+  document.getElementById("filterPanel").classList.remove("open");
+}
+function clearAllFilters(){
+  state.taste.clear();
+  state.regions.clear();
+  state.grapes.clear();
+  state.priceMin = null;
+  state.priceMax = null;
+  document.getElementById("priceMin").value = "";
+  document.getElementById("priceMax").value = "";
+  document.getElementById("regionSearch").value = "";
+  document.getElementById("grapeSearch").value = "";
+  renderTasteTags();
+  renderRegionList("");
+  renderGrapeTags("");
+  updateFilterBadge();
+  renderList();
+}
+
+// ---------- init ----------
+function init(){
+  document.getElementById("priceHint").textContent = `Rango en carta: ${priceFloor}–${priceCeil} €`;
+  renderCategoryChips();
+  renderTasteTags();
+  renderRegionList("");
+  renderGrapeTags("");
+  renderList();
+  updateShortlistUI();
+
+  document.getElementById("searchInput").addEventListener("input", (e)=>{
+    state.query = e.target.value;
+    document.getElementById("clearSearch").classList.toggle("show", !!state.query);
+    renderLimit = 60;
+    renderList();
+  });
+  document.getElementById("clearSearch").addEventListener("click", ()=>{
+    document.getElementById("searchInput").value="";
+    state.query="";
+    document.getElementById("clearSearch").classList.remove("show");
+    renderList();
+  });
+
+  document.getElementById("hideUnavailable").addEventListener("change", (e)=>{
+    state.hideUnavailable = e.target.checked;
+    renderCategoryChips();
+    renderList();
+  });
+
+  document.getElementById("openFilters").addEventListener("click", openFilterPanel);
+  document.getElementById("closeFilters").addEventListener("click", closeFilterPanel);
+  document.getElementById("applyFilters").addEventListener("click", ()=>{ closeFilterPanel(); renderLimit=60; renderList(); });
+  document.getElementById("filterPanel").addEventListener("click", (e)=>{ if(e.target.id==="filterPanel") closeFilterPanel(); });
+  document.getElementById("clearAllFilters").addEventListener("click", clearAllFilters);
+
+  document.getElementById("resetPrice").addEventListener("click", ()=>{
+    state.priceMin=null; state.priceMax=null;
+    document.getElementById("priceMin").value=""; document.getElementById("priceMax").value="";
+    updateFilterBadge();
+  });
+  document.getElementById("resetTaste").addEventListener("click", ()=>{ state.taste.clear(); renderTasteTags(); updateFilterBadge(); });
+  document.getElementById("resetRegion").addEventListener("click", ()=>{ state.regions.clear(); renderRegionList(document.getElementById("regionSearch").value); updateFilterBadge(); });
+  document.getElementById("resetGrape").addEventListener("click", ()=>{ state.grapes.clear(); renderGrapeTags(document.getElementById("grapeSearch").value); updateFilterBadge(); });
+
+  document.getElementById("priceMin").addEventListener("input", (e)=>{
+    state.priceMin = e.target.value===""?null:Number(e.target.value);
+    updateFilterBadge();
+  });
+  document.getElementById("priceMax").addEventListener("input", (e)=>{
+    state.priceMax = e.target.value===""?null:Number(e.target.value);
+    updateFilterBadge();
+  });
+  document.getElementById("regionSearch").addEventListener("input", (e)=> renderRegionList(e.target.value));
+  document.getElementById("grapeSearch").addEventListener("input", (e)=> renderGrapeTags(e.target.value));
+
+  document.getElementById("fabShortlist").addEventListener("click", ()=>{
+    renderShortlistDrawer();
+    document.getElementById("shortlistDrawer").classList.add("open");
+  });
+  document.getElementById("closeDrawer").addEventListener("click", ()=>{
+    document.getElementById("shortlistDrawer").classList.remove("open");
+  });
+  document.getElementById("shortlistDrawer").addEventListener("click", (e)=>{
+    if(e.target.id==="shortlistDrawer") document.getElementById("shortlistDrawer").classList.remove("open");
+  });
+  document.getElementById("clearShortlist").addEventListener("click", ()=>{
+    state.shortlist.clear();
+    updateShortlistUI();
+    renderShortlistDrawer();
+    renderList();
+  });
+  document.getElementById("copyShortlist").addEventListener("click", ()=>{
+    const items = WINES.filter(w=>state.shortlist.has(w.id));
+    const text = items.map(w=>`${w.nombre} — ${w.productora||"—"} — ${(w.etiquetasCata.join(", ")||"sin etiquetas")} — ${fmtPrice(w.precio)} €`).join("\n");
+    if(navigator.clipboard && text){
+      navigator.clipboard.writeText(text).then(()=>showToast("Shortlist copiada")).catch(()=>showToast("No se pudo copiar"));
+    } else {
+      showToast(items.length? "No se pudo copiar" : "La shortlist está vacía");
+    }
+  });
+}
+
+// ---------- boot (loads data from the live sheet via /api/wines) ----------
+async function boot(){
+  document.getElementById("listWrap").innerHTML = `
+    <div class="empty-state">
+      <div class="glyph">🍷</div>
+      <p><strong>Cargando la carta…</strong></p>
+      <p>Sincronizando con la hoja de datos.</p>
+    </div>`;
+  try{
+    const res = await fetch("/api/wines", {cache:"no-store"});
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const data = await res.json();
+    if(!Array.isArray(data) || !data.length) throw new Error("respuesta vacía");
+    WINES = data;
+  } catch(err){
+    document.getElementById("listWrap").innerHTML = `
+      <div class="empty-state">
+        <div class="glyph">⚠️</div>
+        <p><strong>No se pudo cargar la carta.</strong></p>
+        <p>Revisa la conexión y vuelve a intentarlo.</p>
+        <button id="retryBoot">Reintentar</button>
+      </div>`;
+    document.getElementById("retryBoot").addEventListener("click", boot);
+    return;
+  }
+  computeDerived();
+  init();
+}
+boot();
+</script>
+</body>
+</html>
