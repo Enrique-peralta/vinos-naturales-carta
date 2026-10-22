@@ -2,413 +2,249 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Carta de vinos naturales</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Spline+Sans+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
+  /* tokens from the Figma file */
   --bg:#ffffff;
-  --bg-elev:#f6f6f5;
-  --bg-elev-2:#efefee;
-  --border:#e6e5e2;
-  --text:#161514;
-  --text-dim:#5c5b57;
-  --text-faint:#8f8d87;
-  --accent:#F55B27;
-  --accent-soft:rgba(245,91,39,0.1);
-  --accent-strong:#F55B27;
-  --accent-hover:#dd4e1d;
+  --bg-subtle:#f4f3f0;
+  --bg-accent:#2f6b4f;
+  --border:#e8e6e1;
+  --border-strong:#d6d3cc;
+  --grabber:rgba(55,53,47,.35);
+  --text:#1a1917;
+  --text-muted:#45423d;
+  --text-subtle:#75716a;
   --on-accent:#ffffff;
-  --good:#15803d;
-  --warn:#b45309;
-  --bad:#dc2626;
-  --radius:16px;
-  --radius-sm:10px;
+  --warning:#b7791f;
+  --radius-sm:8px;
+  --radius-md:16px;
+  --radius-xl:32px;
+  --radius-full:999px;
+  --fs-md:15px; --lh-md:24px;
+  --fs-sm:14px; --lh-sm:20px;
+  --fs-xs:12px; --lh-xs:16px;
+  --dock-h:120px;
   font-size:16px;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;}
 body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:"Spline Sans Mono","SF Mono",ui-monospace,Menlo,Consolas,monospace;
-  -webkit-font-smoothing:antialiased;
-  overscroll-behavior-y:none;
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:"Spline Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:var(--fs-md);line-height:var(--lh-md);
+  -webkit-font-smoothing:antialiased;overscroll-behavior-y:none;
 }
-button{font-family:inherit;}
-.app{display:flex;flex-direction:column;height:100vh;height:100dvh;}
+button,input{font-family:inherit;font-size:inherit;color:inherit;}
+button{cursor:pointer;}
 
-/* HEADER */
-header{
-  flex:0 0 auto;
-  padding:12px 14px 10px;
-  background:var(--bg);
-  border-bottom:1px solid var(--border);
-  position:sticky;top:0;z-index:20;
+/* masked icons: one svg, any colour */
+.ic{
+  display:block;flex:0 0 auto;width:24px;height:24px;background-color:currentColor;
+  -webkit-mask:var(--icon) center/contain no-repeat;mask:var(--icon) center/contain no-repeat;
 }
-.header-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-.title{font-size:19px;font-weight:800;letter-spacing:0;flex:1;min-width:0;}
-.title small{display:block;font-weight:500;color:var(--text-dim);font-size:12px;margin-top:2px;letter-spacing:0;}
-.count-pill{
-  background:var(--bg-elev);border:1px solid var(--border);color:var(--text-dim);
-  font-size:12px;font-weight:600;padding:5px 11px;border-radius:20px;white-space:nowrap;
-}
+.ic-20{width:20px;height:20px;}
+.i-search{--icon:url(assets/icons/search.svg);}
+.i-x{--icon:url(assets/icons/circle-x.svg);}
+.i-plus{--icon:url(assets/icons/plus.svg);}
+.i-check{--icon:url(assets/icons/check.svg);}
+.i-grape{--icon:url(assets/icons/grape.svg);}
+.i-pin{--icon:url(assets/icons/map-pin.svg);}
+.i-scale{--icon:url(assets/icons/scale.svg);}
+.i-dollar{--icon:url(assets/icons/dollar-sign.svg);}
 
-.searchbar{
-  display:flex;align-items:center;gap:8px;
-  background:var(--bg-elev);border:1px solid var(--border);
-  border-radius:100px;padding:10px 14px;
-}
-.searchbar svg{flex:0 0 auto;opacity:.6;}
-.searchbar input{
-  flex:1;background:transparent;border:0;outline:0;color:var(--text);
-  font-size:16px;min-width:0;
-}
-.searchbar input::placeholder{color:var(--text-faint);}
-.clear-btn{
-  background:none;border:0;color:var(--text-faint);font-size:20px;line-height:1;
-  padding:4px 6px;cursor:pointer;display:none;
-}
-.clear-btn.show{display:block;}
-
-.chiprow{
-  display:flex;gap:8px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none;
-}
-.chiprow::-webkit-scrollbar{display:none;}
-.chip{
-  flex:0 0 auto;padding:8px 14px;border-radius:20px;border:1px solid var(--border);
-  background:var(--bg);color:var(--text-dim);font-size:13.5px;font-weight:600;
-  cursor:pointer;white-space:nowrap;user-select:none;
-}
-.chip.active{background:var(--text);border-color:var(--text);color:#fff;}
-.chip .n{opacity:.55;font-weight:500;margin-left:3px;}
-.chip.active .n{opacity:.75;}
-
-.filter-toggle-row{display:flex;gap:8px;margin-top:8px;align-items:center;}
-.filter-toggle{
-  display:flex;align-items:center;gap:6px;
-  background:var(--bg);border:1px solid var(--border);color:var(--text);
-  padding:8px 13px;border-radius:20px;font-size:13.5px;font-weight:600;cursor:pointer;
-}
-.filter-toggle.has-active{border-color:var(--accent);color:var(--accent-strong);background:var(--accent-soft);}
-.badge-dot{
-  background:var(--accent);color:#fff;border-radius:10px;font-size:11px;
-  padding:1px 6px;font-weight:700;
-}
-.avail-toggle{
-  display:flex;align-items:center;gap:6px;color:var(--text-dim);font-size:12.5px;
-  margin-left:auto;user-select:none;cursor:pointer;
-}
-.avail-toggle input{accent-color:var(--accent);width:15px;height:15px;}
-
-/* FILTER PANEL */
-.filter-panel{
-  position:fixed;inset:0;background:rgba(20,20,20,.45);z-index:40;
-  display:none;
-}
-.filter-panel.open{display:block;}
-.filter-sheet{
-  position:absolute;bottom:0;left:0;right:0;max-height:86vh;
-  background:var(--bg);border-radius:24px 24px 0 0;
-  display:flex;flex-direction:column;
-  box-shadow:0 -8px 40px rgba(20,20,20,.18);
-  animation:slideup .18s ease-out;
-}
-@keyframes slideup{from{transform:translateY(20px);opacity:.4;}to{transform:translateY(0);opacity:1;}}
-.filter-sheet-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:18px 18px 12px;border-bottom:1px solid var(--border);flex:0 0 auto;
-}
-.filter-sheet-header h2{font-size:17px;margin:0;font-weight:800;letter-spacing:0;}
-.filter-sheet-header button{
-  background:none;border:0;color:var(--text-dim);font-size:14px;font-weight:600;cursor:pointer;padding:6px;
-}
-.filter-sheet-body{overflow-y:auto;padding:16px 18px 10px;flex:1 1 auto;}
-.filter-group{margin-bottom:22px;}
-.filter-group-title{font-size:12px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
-.filter-group-title .reset-mini{font-size:11.5px;text-transform:none;font-weight:700;color:var(--accent-strong);letter-spacing:0;cursor:pointer;}
-.tagwrap{display:flex;flex-wrap:wrap;gap:7px;}
-.tagbtn{
-  padding:7px 13px;border-radius:16px;border:1px solid var(--border);
-  background:var(--bg);color:var(--text-dim);font-size:13px;font-weight:500;cursor:pointer;
-}
-.tagbtn.active{background:var(--text);border-color:var(--text);color:#fff;}
-.mini-search{
-  width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);
-  background:var(--bg-elev);color:var(--text);font-size:14px;margin-bottom:9px;outline:0;
-}
-.price-row{display:flex;align-items:center;gap:10px;}
-.price-input{
-  flex:1;padding:10px 11px;border-radius:10px;border:1px solid var(--border);
-  background:var(--bg-elev);color:var(--text);font-size:14px;outline:0;width:100%;
-}
-.price-input:focus, .mini-search:focus{border-color:var(--accent);}
-.price-sep{color:var(--text-faint);font-size:13px;}
-.price-hint{font-size:11.5px;color:var(--text-faint);margin-top:6px;}
-.region-list{max-height:230px;overflow-y:auto;border:1px solid var(--border);border-radius:12px;}
-.region-item{
-  display:flex;align-items:center;gap:9px;padding:9px 12px;font-size:13.5px;
-  border-bottom:1px solid var(--border);cursor:pointer;color:var(--text-dim);
-}
-.region-item:last-child{border-bottom:0;}
-.region-item input{accent-color:var(--accent);width:16px;height:16px;flex:0 0 auto;}
-.region-item.checked{color:var(--text);font-weight:600;background:var(--bg-elev);}
-.filter-sheet-footer{
-  flex:0 0 auto;padding:12px 18px calc(14px + env(safe-area-inset-bottom));
-  border-top:1px solid var(--border);display:flex;gap:10px;
-}
-.btn{
-  flex:1;padding:13px;border-radius:100px;border:0;font-size:14.5px;font-weight:700;cursor:pointer;
-}
-.btn-ghost{background:var(--bg);color:var(--text);border:1px solid var(--border);}
-.btn-primary{background:var(--accent);color:var(--on-accent);}
-@media (hover:hover){
-  .btn-primary:hover{background:var(--accent-hover);}
-  .btn-ghost:hover{background:var(--bg-elev);}
-}
+.app{max-width:480px;margin:0 auto;min-height:100%;position:relative;}
 
 /* LIST */
-main{flex:1 1 auto;overflow-y:auto;padding:12px 12px 90px;}
-.empty-state{
-  text-align:center;padding:60px 20px;color:var(--text-dim);
+main{padding:max(16px,env(safe-area-inset-top)) 16px calc(var(--dock-h) + 16px);}
+.row{position:relative;}
+.row:not(:last-child)::after{
+  content:"";position:absolute;left:16px;right:0;bottom:0;height:1px;background:var(--border);
 }
-.empty-state .glyph{font-size:34px;margin-bottom:10px;}
-.empty-state p{margin:4px 0;font-size:14px;}
-.empty-state p strong{color:var(--text);}
-.empty-state button{margin-top:14px;background:var(--accent);color:var(--on-accent);border:0;padding:10px 18px;border-radius:100px;font-size:13.5px;font-weight:700;cursor:pointer;}
+.row-head{display:flex;align-items:center;gap:12px;padding:12px 0 12px 16px;cursor:pointer;}
+.row-main{flex:1 1 0;min-width:0;}
+.row-title{display:flex;gap:4px;align-items:baseline;white-space:nowrap;overflow:hidden;}
+.row-name{font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;}
+.row-vintage{color:var(--text-muted);flex:0 0 auto;}
+.row-meta{font-size:var(--fs-sm);line-height:var(--lh-sm);color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.row-extra{font-size:var(--fs-sm);line-height:var(--lh-sm);color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.row-extra.profile{font-size:var(--fs-xs);line-height:var(--lh-xs);color:var(--text-subtle);}
+.row-dot{position:absolute;left:-4px;top:20px;width:8px;height:8px;}
+.row-dot img{display:block;width:8px;height:8px;}
+.row-trail{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;}
+.row-price{font-weight:500;white-space:nowrap;}
+.row-stock{font-size:var(--fs-xs);line-height:var(--lh-xs);font-weight:500;color:var(--warning);height:20px;display:flex;align-items:center;white-space:nowrap;}
+.add-btn{
+  flex:0 0 auto;width:36px;height:36px;border-radius:var(--radius-full);
+  border:1px solid var(--border-strong);background:var(--bg);color:var(--text);
+  display:flex;align-items:center;justify-content:center;padding:0;
+}
+.add-btn .ic{width:20px;height:20px;}
+.add-btn.added{background:var(--bg-accent);border-color:var(--bg-accent);color:var(--on-accent);}
+.row-expand{max-height:0;overflow:hidden;transition:max-height .22s ease;padding:0 0 0 16px;}
+.row.open .row-expand{max-height:620px;}
+.expand-inner{border-top:1px solid var(--border);padding:12px 0 12px;font-size:var(--fs-sm);line-height:var(--lh-sm);color:var(--text-muted);}
+.expand-row{margin-bottom:10px;}
+.expand-label{font-size:var(--fs-xs);line-height:var(--lh-xs);color:var(--text-subtle);font-weight:500;margin-bottom:2px;}
+.tagline{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+.tastetag,.grapetag{
+  font-size:var(--fs-xs);line-height:var(--lh-xs);padding:4px 10px;border-radius:var(--radius-md);
+  background:var(--bg-subtle);color:var(--text-muted);
+}
+.tastetag.empty,.grapetag.unconfirmed{background:transparent;border:1px dashed var(--border-strong);color:var(--text-subtle);}
 
-.card{
-  background:var(--bg);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  padding:10px 12px 9px;margin-bottom:8px;position:relative;
-  transition:border-color .15s ease;
+.empty-state{text-align:center;padding:60px 20px;color:var(--text-muted);}
+.empty-state p{margin:4px 0;}
+.empty-state p strong{color:var(--text);font-weight:500;}
+.btn{
+  flex:1;padding:12px 16px;border-radius:var(--radius-full);border:1px solid transparent;font-weight:500;
 }
-.card-top{display:flex;gap:10px;align-items:flex-start;}
-.card-main{flex:1;min-width:0;}
+.btn-ghost{background:var(--bg);color:var(--text);border-color:var(--border-strong);}
+.btn-primary{background:var(--bg-accent);color:var(--on-accent);}
+.empty-state .btn{flex:none;margin-top:14px;}
 
-.card-name{font-size:15px;font-weight:700;line-height:1.32;overflow-wrap:anywhere;}
-.card-producer{font-size:12.5px;color:var(--text-dim);margin-top:1px;overflow-wrap:anywhere;}
+/* DOCK (filters + shortlist bar) */
+.dock{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:480px;z-index:30;
+  display:flex;flex-direction:column;
+}
+.sheet{
+  position:relative;background:var(--bg-subtle);border-radius:var(--radius-xl) var(--radius-xl) 0 0;
+  box-shadow:0 -8px 40px rgba(26,25,23,.08);
+  padding-bottom:max(env(safe-area-inset-bottom),14px);
+  display:flex;flex-direction:column;
+}
+.sheet.stacked{padding-bottom:calc(max(env(safe-area-inset-bottom),14px) + 24px);}
+.grabber{
+  position:absolute;top:0;left:0;right:0;height:24px;border:0;background:none;padding:0;z-index:2;
+}
+.grabber::after{
+  content:"";position:absolute;left:50%;top:11px;width:36px;height:5px;margin-left:-18px;
+  border-radius:var(--radius-full);background:var(--grabber);
+}
+.sheet-head{padding:16px 16px 0;}
+.filter-by{padding:0 8px;color:var(--text-subtle);}
+.head-row{display:flex;align-items:center;gap:12px;padding:12px 8px;min-height:48px;}
+.head-label{flex:1 1 0;min-width:0;font-weight:500;}
+.head-label.muted{font-weight:400;color:var(--text-subtle);}
+.head-btn{background:none;border:0;padding:0;width:24px;height:24px;display:flex;align-items:center;justify-content:center;color:var(--text-subtle);}
+.head-btn .ic{width:20px;height:20px;}
+.head-search{flex:1 1 0;min-width:0;border:0;background:transparent;outline:0;font-weight:500;color:var(--text);padding:0;}
+.head-search::placeholder{color:var(--text-subtle);font-weight:400;}
+.count-chip{background:rgba(255,255,255,.2);border-radius:var(--radius-sm);padding:0 8px;font-weight:500;}
 
-.card-price{font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;text-align:right;flex:0 0 auto;}
-.card-price .cur{font-size:10.5px;font-weight:500;color:var(--text-faint);}
+/* shortlist bar */
+.sheet.green{background:var(--bg-accent);color:var(--on-accent);margin-top:-24px;z-index:1;box-shadow:none;}
+.sheet.green .head-row{padding:12px 8px;}
+.sheet.green .head-btn{color:var(--on-accent);}
+.sheet.green .head-label{font-weight:400;}
+.sheet.green .grabber::after{background:rgba(255,255,255,.45);}
+.sheet.green .head-row{cursor:pointer;}
 
-.card-meta{display:flex;flex-wrap:wrap;gap:5px 8px;margin-top:6px;font-size:11.5px;color:var(--text-dim);align-items:center;}
-.dot-sep::before{content:"·";margin-right:8px;color:var(--text-faint);}
-.meta-cat{display:inline-flex;align-items:center;gap:5px;}
-.cat-dot{
-  width:8px;height:8px;border-radius:50%;flex:0 0 auto;
-  background:var(--cat-color,var(--text-faint));
-  box-shadow:inset 0 0 0 1px rgba(20,20,20,.12);
+/* segmented control (wine type) */
+.seg{
+  display:flex;margin:12px 0 0;border:1px solid var(--border);border-radius:var(--radius-md);
 }
-.flag{margin-right:2px;}
-.cat-pill{
-  font-size:11px;font-weight:700;padding:2px 8px;border-radius:8px;
-  background:var(--bg-elev);color:var(--text-dim);letter-spacing:.2px;
+.seg-item{
+  flex:1 1 0;min-width:0;border:0;background:transparent;border-radius:var(--radius-md);
+  padding:8px 0;display:flex;align-items:center;justify-content:center;
 }
+.seg-item.on{background:var(--bg);}
+.seg-ico{width:24px;height:24px;display:flex;align-items:center;justify-content:center;}
+.seg-ico img,.seg-ico .dotcss{display:block;width:20px;height:20px;}
+.dotcss{border-radius:50%;}
 
-.tagline{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
-.tastetag{
-  font-size:11px;padding:3px 8px;border-radius:7px;background:var(--bg-elev);color:var(--text-dim);font-weight:600;
+.sheet-content{padding:16px;overflow-y:auto;max-height:46vh;}
+.sheet.expanded .sheet-content{max-height:none;}
+.sheet.expanded{height:88vh;height:88dvh;}
+.sheet.expanded .sheet-content{flex:1 1 auto;min-height:0;padding-bottom:56px;}
+.chips{display:flex;flex-wrap:wrap;gap:12px 8px;}
+.chip{
+  border:0;background:var(--bg);color:var(--text-muted);border-radius:var(--radius-md);
+  padding:8px 16px;white-space:nowrap;max-width:100%;
 }
-.tastetag.more{background:transparent;color:var(--text-faint);font-weight:500;padding:3px 3px;}
-.tastetag.empty{background:transparent;border:1px dashed var(--border);color:var(--text-faint);font-weight:500;}
-.grapetag{
-  font-size:11.5px;padding:4px 9px;border-radius:8px;background:var(--bg);color:var(--text-dim);border:1px solid var(--border);
+.chip.on{background:var(--bg-accent);color:var(--on-accent);}
+.chip.wide{flex:1 1 0;text-align:center;}
+.chip.more{background:var(--bg-subtle);border:1px solid var(--border);color:var(--text);font-weight:500;}
+.chips-body-row{display:flex;gap:8px;margin-bottom:12px;}
+.none-found{color:var(--text-subtle);padding:8px;}
+.show-less{
+  position:absolute;left:50%;transform:translateX(-50%);bottom:calc(64px + max(env(safe-area-inset-bottom),14px) + 16px);
+  background:var(--bg-accent);color:var(--on-accent);border:0;border-radius:var(--radius-full);
+  padding:8px 20px;font-weight:500;box-shadow:0 6px 20px rgba(26,25,23,.2);z-index:3;
 }
-.grapetag.unconfirmed{border-style:dashed;color:var(--text-faint);}
-
-.stock-tag{font-size:11px;font-weight:700;padding:2px 7px;border-radius:7px;display:inline-flex;align-items:center;gap:4px;}
-.stock-tag::before{content:"";width:5px;height:5px;border-radius:50%;}
-.stock-ok{background:rgba(21,128,61,.1);color:var(--good);}
-.stock-ok::before{background:var(--good);}
-.stock-low{background:rgba(180,83,9,.1);color:var(--warn);}
-.stock-low::before{background:var(--warn);}
-.stock-out{background:rgba(220,38,38,.1);color:var(--bad);}
-.stock-out::before{background:var(--bad);}
-.stock-check{background:rgba(180,83,9,.1);color:var(--warn);}
-.stock-check::before{background:var(--warn);}
-
-.card-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px;}
-.ficha-link{
-  background:none;border:0;color:var(--text-dim);font-weight:600;font-size:12px;
-  cursor:pointer;padding:4px 2px;display:flex;align-items:center;gap:4px;
-}
-.ficha-link:active{color:var(--text);}
-.select-chip{
-  flex:0 0 auto;border:1.5px solid var(--accent);background:var(--bg);color:var(--accent);
-  font-weight:700;font-size:12px;padding:6px 12px;border-radius:100px;cursor:pointer;
-  white-space:nowrap;
-}
-.select-chip.active{background:var(--accent);border-color:var(--accent);color:#fff;}
-
-.card-expand{
-  margin-top:0;max-height:0;overflow:hidden;transition:max-height .22s ease;
-}
-.card.open{border-color:var(--text-faint);}
-.card.open .card-expand{max-height:520px;margin-top:8px;}
-.expand-inner{border-top:1px solid var(--border);padding-top:10px;font-size:13px;color:var(--text-dim);line-height:1.55;}
-.expand-row{margin-bottom:8px;}
-.expand-label{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--text-faint);font-weight:700;margin-bottom:2px;}
-.expand-flag{
-  display:inline-block;margin-top:4px;font-size:11.5px;color:var(--warn);background:rgba(180,83,9,.1);
-  padding:3px 8px;border-radius:7px;
+.fade-bottom{
+  position:absolute;left:0;right:0;bottom:calc(64px + max(env(safe-area-inset-bottom),14px) + 8px);height:72px;pointer-events:none;
+  background:linear-gradient(to bottom,rgba(244,243,240,0),var(--bg-subtle));z-index:2;
 }
 
-/* SHORTLIST FAB + DRAWER */
-.fab{
-  position:fixed;left:14px;right:14px;bottom:14px;z-index:30;
-  background:var(--accent);color:var(--on-accent);border:0;border-radius:100px;
-  padding:15px 20px;font-size:14.5px;font-weight:700;display:none;
-  align-items:center;justify-content:space-between;box-shadow:0 10px 28px rgba(245,91,39,.35);
-  cursor:pointer;
+/* price */
+.price-row{display:flex;align-items:center;gap:8px;}
+.price-sep{color:var(--text-muted);}
+.price-input{
+  flex:1 1 0;min-width:0;border:0;outline:0;background:var(--bg);border-radius:var(--radius-md);
+  padding:12px 16px;color:var(--text);
 }
-.fab.show{display:flex;}
-.fab .fab-count{background:rgba(255,255,255,.28);border-radius:20px;padding:2px 10px;font-size:13px;}
+.price-input::placeholder{color:var(--text-subtle);}
+.price-input:focus{box-shadow:0 0 0 1.5px var(--bg-accent);}
+.price-hint{font-size:var(--fs-xs);line-height:var(--lh-xs);color:var(--text-subtle);padding:8px 16px 0;}
 
-.drawer{
-  position:fixed;inset:0;background:rgba(20,20,20,.45);z-index:50;display:none;
+/* filter tabs */
+.tabs{display:flex;gap:8px;padding:0 16px;}
+.tab{
+  position:relative;flex:1 1 0;min-width:0;height:64px;border:0;border-radius:var(--radius-md);background:transparent;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  color:var(--text-subtle);font-size:var(--fs-xs);line-height:var(--lh-xs);font-weight:500;
 }
+.tab.sel{background:var(--bg);color:var(--text);}
+.tab .ico{position:relative;}
+.tab.active .ico::after{
+  content:"";position:absolute;top:-3px;right:-4px;width:10px;height:10px;border-radius:50%;
+  background:var(--bg-accent);border:2px solid var(--bg-subtle);box-sizing:content-box;margin:-2px -2px 0 0;
+}
+.tab.sel.active .ico::after{border-color:var(--bg);}
+
+/* shortlist drawer */
+.drawer{position:fixed;inset:0;background:rgba(26,25,23,.4);z-index:50;display:none;}
 .drawer.open{display:block;}
 .drawer-sheet{
-  position:absolute;bottom:0;left:0;right:0;top:8vh;
-  background:var(--bg);border-radius:24px 24px 0 0;display:flex;flex-direction:column;
-  box-shadow:0 -8px 40px rgba(20,20,20,.18);
+  position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;top:8vh;
+  background:var(--bg);border-radius:var(--radius-xl) var(--radius-xl) 0 0;display:flex;flex-direction:column;
   animation:slideup .18s ease-out;
 }
-.drawer-header{
-  display:flex;align-items:center;justify-content:space-between;padding:18px 18px 12px;
-  border-bottom:1px solid var(--border);flex:0 0 auto;
-}
-.drawer-header h2{font-size:17px;margin:0;font-weight:800;letter-spacing:0;}
-.drawer-header button{background:none;border:0;color:var(--text-dim);font-size:14px;font-weight:600;cursor:pointer;padding:6px;}
-.drawer-body{flex:1;overflow-y:auto;padding:8px 0;}
-
-.slrow{
-  padding:11px 18px;border-bottom:1px solid var(--border);
-}
-.slrow.open{background:var(--bg-elev);}
-.slrow-head{display:flex;align-items:flex-start;gap:10px;}
-.slrow-main{flex:1;min-width:0;}
-.slrow-name{font-size:14px;font-weight:700;letter-spacing:0;overflow-wrap:anywhere;}
-.slrow-sub{font-size:12px;color:var(--text-dim);margin-top:2px;}
-.slrow-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;}
-.slrow-tags .tastetag{font-size:10.5px;padding:2px 7px;}
-.slrow-side{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:0 0 auto;}
-.slrow-price{font-weight:800;font-size:14.5px;white-space:nowrap;}
-.slrow-remove{
-  background:none;border:0;color:var(--text-faint);font-size:20px;cursor:pointer;padding:0 4px;flex:0 0 auto;line-height:1;
-}
-.slrow .ficha-link{margin-top:4px;padding:4px 2px;}
-.slrow.open .card-expand{max-height:520px;margin-top:4px;}
-.drawer-footer{
-  flex:0 0 auto;padding:12px 18px calc(14px + env(safe-area-inset-bottom));
-  border-top:1px solid var(--border);display:flex;gap:10px;
-}
-.sl-empty{padding:50px 20px;text-align:center;color:var(--text-dim);font-size:13.5px;}
+@keyframes slideup{from{transform:translate(-50%,20px);opacity:.4;}to{transform:translate(-50%,0);opacity:1;}}
+.drawer-header{display:flex;align-items:center;justify-content:space-between;padding:24px 24px 12px;flex:0 0 auto;}
+.drawer-header h2{font-size:17px;margin:0;font-weight:500;}
+.drawer-header button{background:none;border:0;color:var(--text-subtle);font-weight:500;padding:6px;}
+.drawer-body{flex:1;overflow-y:auto;padding:0 16px;}
+.slrow .row-head{align-items:flex-start;}
+.slrow-remove{background:none;border:0;padding:0;width:36px;height:36px;display:flex;align-items:center;justify-content:center;color:var(--text-subtle);}
+.slrow-remove .ic{width:20px;height:20px;}
+.drawer-footer{flex:0 0 auto;padding:12px 16px max(env(safe-area-inset-bottom),14px);display:flex;gap:8px;}
+.sl-empty{padding:50px 20px;text-align:center;color:var(--text-muted);}
 
 .toast{
-  position:fixed;left:50%;bottom:90px;transform:translateX(-50%);
-  background:var(--text);border:0;color:#fff;
-  padding:10px 18px;border-radius:20px;font-size:13px;font-weight:600;z-index:60;opacity:0;
-  box-shadow:0 6px 20px rgba(20,20,20,.25);
-  transition:opacity .2s ease;pointer-events:none;
+  position:fixed;left:50%;bottom:calc(var(--dock-h) + 16px);transform:translateX(-50%);
+  background:var(--text);color:#fff;padding:8px 16px;border-radius:var(--radius-full);
+  font-size:var(--fs-sm);line-height:var(--lh-sm);font-weight:500;z-index:60;opacity:0;
+  transition:opacity .2s ease;pointer-events:none;white-space:nowrap;
 }
 .toast.show{opacity:1;}
 
-@media (min-width:720px){
-  main{padding:16px 20px 90px;}
-  .card-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;align-content:start;}
-  .fab{left:auto;width:260px;right:20px;bottom:20px;}
-  .filter-sheet,.drawer-sheet{max-width:520px;margin:0 auto;right:0;border-radius:20px;top:5vh;bottom:5vh;left:0;}
+@media (hover:hover){
+  .chip:not(.on):hover{background:#fbfbfa;}
+  .add-btn:not(.added):hover{background:var(--bg-subtle);}
 }
 </style>
 </head>
 <body>
 <div class="app">
-
-  <header>
-    <div class="header-top">
-      <div class="title">Carta de vinos naturales<small>Selección para sala · solo lectura</small></div>
-      <div class="count-pill" id="resultCount">…</div>
-    </div>
-
-    <div class="searchbar">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      <input id="searchInput" type="text" placeholder="Buscar vino o productor… (tolera errores)" autocomplete="off" autocorrect="off" spellcheck="false">
-      <button class="clear-btn" id="clearSearch">×</button>
-    </div>
-
-    <div class="chiprow" id="categoryChips"></div>
-
-    <div class="filter-toggle-row">
-      <button class="filter-toggle" id="openFilters">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        Filtros
-        <span class="badge-dot" id="filterCountBadge" style="display:none;">0</span>
-      </button>
-      <label class="avail-toggle">
-        <input type="checkbox" id="hideUnavailable" checked>
-        Solo disponibles
-      </label>
-    </div>
-  </header>
-
-  <main>
-    <div id="listWrap"></div>
-  </main>
-
-  <button class="fab" id="fabShortlist">
-    <span>📋 Ver shortlist</span>
-    <span class="fab-count" id="fabCount">0</span>
-  </button>
-</div>
-
-<!-- FILTER PANEL -->
-<div class="filter-panel" id="filterPanel">
-  <div class="filter-sheet">
-    <div class="filter-sheet-header">
-      <h2>Filtros</h2>
-      <button id="closeFilters">Cerrar</button>
-    </div>
-    <div class="filter-sheet-body">
-
-      <div class="filter-group">
-        <div class="filter-group-title">Precio (€)<span class="reset-mini" id="resetPrice">quitar</span></div>
-        <div class="price-row">
-          <input type="number" class="price-input" id="priceMin" placeholder="min">
-          <span class="price-sep">—</span>
-          <input type="number" class="price-input" id="priceMax" placeholder="max">
-        </div>
-        <div class="price-hint" id="priceHint"></div>
-      </div>
-
-      <div class="filter-group">
-        <div class="filter-group-title">Etiquetas de cata<span class="reset-mini" id="resetTaste">quitar</span></div>
-        <div class="tagwrap" id="tasteTags"></div>
-      </div>
-
-      <div class="filter-group">
-        <div class="filter-group-title">Región<span class="reset-mini" id="resetRegion">quitar</span></div>
-        <input type="text" class="mini-search" id="regionSearch" placeholder="Buscar región…">
-        <div class="region-list" id="regionList"></div>
-      </div>
-
-      <div class="filter-group">
-        <div class="filter-group-title">Uva<span class="reset-mini" id="resetGrape">quitar</span></div>
-        <input type="text" class="mini-search" id="grapeSearch" placeholder="Buscar uva…">
-        <div class="tagwrap" id="grapeTags"></div>
-      </div>
-
-    </div>
-    <div class="filter-sheet-footer">
-      <button class="btn btn-ghost" id="clearAllFilters">Limpiar todo</button>
-      <button class="btn btn-primary" id="applyFilters">Ver resultados</button>
-    </div>
-  </div>
+  <main><div id="listWrap"></div></main>
+  <div class="dock" id="dock"></div>
 </div>
 
 <!-- SHORTLIST DRAWER -->
@@ -431,46 +267,54 @@ main{flex:1 1 auto;overflow-y:auto;padding:12px 12px 90px;}
 <script>
 let WINES = [];
 
-const TASTE_TAGS_ORDER = ["Fresco","Mineral","Acídico","Afrutado","Eléctrico","Vibrante","Ligero","Con cuerpo","Cuerpo medio","Especiado","Tropical","Volátil"];
-const CATEGORY_ORDER = ["Blanco","Tinto","Orange","Burbujas","Rosado","Dulce","Sin alcohol"];
-
-// A small color dot per category — like the language-color convention on
-// GitHub repo lists: the dot carries the color, the label stays neutral text.
-// Bubbly/white/orange/rose/red come from the palette Enrique specified; Dulce
-// and Sin alcohol are extrapolated to stay visually distinct from those five.
-const CATEGORY_META = {
-  "Burbujas":    {color:"#E8D258"},
-  "Blanco":      {color:"#F0EDE1"},
-  "Orange":      {color:"#F55B27"},
-  "Rosado":      {color:"#EDB2BA"},
-  "Tinto":       {color:"#A83E4D"},
-  "Dulce":       {color:"#C08A2E"},
-  "Sin alcohol": {color:"#9CA3AF"},
+// UI copy, as written in the Figma file. Change here to localise.
+const T = {
+  tabs: {grape:"Tipo", region:"Región", profile:"Notas", price:"Precio"},
+  headers: {grape:"Tipo de uva", region:"Región", profile:"Notas", price:"Precio"},
+  filterBy: "Filtrar por",
+  showAll: "Ver todo",
+  showLess: "Ver menos",
+  min: "Min",
+  max: "Max",
+  priceHint: (lo,hi)=>`Rango en carta: ${lo}–${hi} €`,
+  noFilters: "Filtros",
+  filtersActive: n => n===1 ? "filtro activo" : "filtros activos",
+  inShortlist: n => n===1 ? "vino en la shortlist" : "vinos en la shortlist",
+  noMatches: "Sin coincidencias",
 };
-function catMeta(cat){
-  return CATEGORY_META[cat] || {color:"#8f8d87"};
+
+const TABS = ["grape","region","profile","price"];
+const TAB_ICON = {grape:"i-grape", region:"i-pin", profile:"i-scale", price:"i-dollar"};
+const SEARCHABLE = {grape:true, region:true};
+const COMMON_COUNT = 17;
+
+// Profile tab: body first (own row), then the rest in the order of the design.
+const BODY_TAGS = ["Con cuerpo","Cuerpo medio","Ligero"];
+const OTHER_TAGS = ["Fresco","Vibrante","Eléctrico","Acídico","Afrutado","Tropical","Especiado","Mineral","Volátil"];
+
+// Wine-type dots: the five from Figma are SVG assets; the two extra categories
+// in the sheet (not in the design) fall back to a CSS circle.
+const CATEGORY_ORDER = ["Blanco","Tinto","Rosado","Orange","Burbujas","Dulce","Sin alcohol"];
+const CATEGORY_DOT = {
+  "Blanco":"assets/dots/white.svg",
+  "Tinto":"assets/dots/red.svg",
+  "Rosado":"assets/dots/rose.svg",
+  "Orange":"assets/dots/orange.svg",
+  "Burbujas":"assets/dots/sparkling.svg",
+};
+const CATEGORY_FALLBACK_COLOR = {"Dulce":"#C08A2E","Sin alcohol":"#9CA3AF"};
+function dotImg(cat, size){
+  const src = CATEGORY_DOT[cat];
+  if(src) return `<img src="${src}" alt="" width="${size}" height="${size}">`;
+  return `<span class="dotcss" style="width:${size}px;height:${size}px;background:${CATEGORY_FALLBACK_COLOR[cat]||"#8f8d87"}"></span>`;
 }
 
-// Country → flag emoji, keyed on the exact strings present in the sheet.
 const COUNTRY_FLAGS = {
-  "España": "🇪🇸",
-  "Francia": "🇫🇷",
-  "Italia": "🇮🇹",
-  "Portugal": "🇵🇹",
-  "Alemania": "🇩🇪",
-  "Austria": "🇦🇹",
-  "Argentina": "🇦🇷",
-  "Chile": "🇨🇱",
-  "Croacia": "🇭🇷",
-  "Georgia": "🇬🇪",
-  "Grecia": "🇬🇷",
-  "Hungaria": "🇭🇺",
-  "República Checa": "🇨🇿",
-  "Slovakia": "🇸🇰",
+  "España":"🇪🇸","Francia":"🇫🇷","Italia":"🇮🇹","Portugal":"🇵🇹","Alemania":"🇩🇪","Austria":"🇦🇹",
+  "Argentina":"🇦🇷","Chile":"🇨🇱","Croacia":"🇭🇷","Georgia":"🇬🇪","Grecia":"🇬🇷","Hungaria":"🇭🇺",
+  "República Checa":"🇨🇿","Slovakia":"🇸🇰",
 };
-function flagFor(pais){
-  return COUNTRY_FLAGS[pais] || "";
-}
+function flagFor(pais){ return COUNTRY_FLAGS[pais] || ""; }
 
 // ---------- state ----------
 const state = {
@@ -483,14 +327,14 @@ const state = {
   priceMax: null,
   hideUnavailable: true,
   shortlist: new Set(),
-  openCard: null,
+  openRow: null,
   openSlRow: null,
 };
+const ui = { open:false, tab:"grape", expanded:false, searching:false, searchText:"" };
 
 // ---------- helpers ----------
-function normalize(s){
-  return (s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
-}
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function normalize(s){ return (s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,""); }
 function levenshtein(a,b){
   if(a===b) return 0;
   const al=a.length, bl=b.length;
@@ -512,7 +356,7 @@ function tokenFuzzyMatch(token, word){
   if(!word || word.length<2) return false;
   if(word.startsWith(token) || word.indexOf(token)!==-1) return true;
   if(token.length>=4 && word.length>=4 && word.indexOf(token)===-1 && token.indexOf(word)!==-1) return true;
-  if(token.length<=2) return false; // too short to fuzzy-match reliably
+  if(token.length<=2) return false;
   const maxDist = token.length<=4?1:(token.length<=8?2:3);
   return levenshtein(token,word)<=maxDist;
 }
@@ -530,42 +374,56 @@ function matchesQuery(w, query){
   const qTokens = normalize(query).split(/\s+/).filter(Boolean);
   return qTokens.every(qt => w._hay.includes(qt) || w._words.some(word => tokenFuzzyMatch(qt, word)));
 }
-function fmtPrice(p){
-  return p==null ? "—" : p.toFixed(2).replace(".",",");
-}
-function stockInfo(stock){
-  if(stock.kind==="number"){
-    if(stock.value<=0) return {cls:"stock-out", label:"Agotado"};
-    if(stock.value<=2) return {cls:"stock-low", label:"Quedan "+stock.value};
-    return {cls:"stock-ok", label:stock.value+" uds"};
-  }
-  if(stock.kind==="consultar") return {cls:"stock-check", label:"Consultar"};
-  if(stock.kind==="no_vender") return {cls:"stock-out", label:"No disponible"};
-  return {cls:"stock-check", label:"Sin dato de stock"};
-}
+function fmtPrice(p){ return p==null ? "—" : p.toFixed(2).replace(".",","); }
 function isSellable(w){
   const s = w.stock;
   if(s.kind==="no_vender") return false;
   if(s.kind==="number" && s.value<=0) return false;
   return true;
 }
+// Stock is only called out when 1–2 bottles are left.
+function lowStockLabel(w){
+  const s = w.stock;
+  return (s.kind==="number" && s.value>0 && s.value<=2) ? `${s.value} left` : "";
+}
 
 // ---------- derived data ----------
-let allRegions = [], grapeCounts = {}, allGrapesSorted = [], topGrapes = [];
-let prices = [], priceFloor = 0, priceCeil = 0, categoryCounts = {};
+let allRegions = [], regionCounts = {}, grapeCounts = {}, allGrapesSorted = [];
+let commonGrapes = [], commonRegions = [];
+let priceFloor = 0, priceCeil = 0;
+const byName = (a,b)=>a.localeCompare(b,"es");
 function computeDerived(){
-  allRegions = [...new Set(WINES.map(w=>w.regionNorm).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
+  regionCounts = {};
+  WINES.forEach(w => { if(w.regionNorm) regionCounts[w.regionNorm]=(regionCounts[w.regionNorm]||0)+1; });
+  allRegions = Object.keys(regionCounts).sort(byName);
+  commonRegions = Object.keys(regionCounts).sort((a,b)=>regionCounts[b]-regionCounts[a]).slice(0,COMMON_COUNT).sort(byName);
+
   grapeCounts = {};
   WINES.forEach(w => w.uvasTags.forEach(g => grapeCounts[g]=(grapeCounts[g]||0)+1));
-  allGrapesSorted = Object.keys(grapeCounts).sort((a,b)=>grapeCounts[b]-grapeCounts[a]);
-  topGrapes = allGrapesSorted.slice(0,18);
+  allGrapesSorted = Object.keys(grapeCounts).sort(byName);
+  commonGrapes = Object.keys(grapeCounts).sort((a,b)=>grapeCounts[b]-grapeCounts[a]).slice(0,COMMON_COUNT).sort(byName);
 
-  prices = WINES.map(w=>w.precio).filter(p=>p!=null);
+  const prices = WINES.map(w=>w.precio).filter(p=>p!=null);
   priceFloor = prices.length ? Math.floor(Math.min(...prices)) : 0;
   priceCeil = prices.length ? Math.ceil(Math.max(...prices)) : 0;
+}
 
-  categoryCounts = {};
-  WINES.forEach(w => categoryCounts[w.categoria]=(categoryCounts[w.categoria]||0)+1);
+// Grape chips follow the wine-type segment: only grapes used by wines of the
+// selected type are offered (all grapes when no type is selected).
+function grapesForCategory(){
+  const counts = {};
+  WINES.forEach(w=>{
+    if(state.category!=="Todos" && w.categoria!==state.category) return;
+    if(state.hideUnavailable && !isSellable(w)) return;
+    w.uvasTags.forEach(g=>counts[g]=(counts[g]||0)+1);
+  });
+  const all = Object.keys(counts).sort(byName);
+  const common = Object.keys(counts).sort((a,b)=>counts[b]-counts[a]).slice(0,COMMON_COUNT).sort(byName);
+  return {all, common};
+}
+function pruneGrapesToCategory(){
+  const valid = new Set(grapesForCategory().all);
+  [...state.grapes].forEach(g=>{ if(!valid.has(g)) state.grapes.delete(g); });
 }
 
 // ---------- filtering ----------
@@ -574,275 +432,360 @@ function getFiltered(){
     if(state.hideUnavailable && !isSellable(w)) return false;
     if(state.category!=="Todos" && w.categoria!==state.category) return false;
     if(!matchesQuery(w, state.query)) return false;
-    if(state.taste.size){
-      const has = w.etiquetasCata.some(t=>state.taste.has(t));
-      if(!has) return false;
-    }
+    if(state.taste.size && !w.etiquetasCata.some(t=>state.taste.has(t))) return false;
     if(state.regions.size && !state.regions.has(w.regionNorm)) return false;
-    if(state.grapes.size){
-      const has = w.uvasTags.some(g=>state.grapes.has(g));
-      if(!has) return false;
-    }
+    if(state.grapes.size && !w.uvasTags.some(g=>state.grapes.has(g))) return false;
     if(state.priceMin!=null && (w.precio==null || w.precio<state.priceMin)) return false;
     if(state.priceMax!=null && (w.precio==null || w.precio>state.priceMax)) return false;
     return true;
   });
 }
-
-// ---------- render: category chips ----------
-function renderCategoryChips(){
-  const wrap = document.getElementById("categoryChips");
-  const totalAvail = WINES.filter(w=>!state.hideUnavailable || isSellable(w)).length;
-  let html = `<div class="chip ${state.category==='Todos'?'active':''}" data-cat="Todos">Todos <span class="n">${totalAvail}</span></div>`;
-  CATEGORY_ORDER.forEach(cat=>{
-    const n = WINES.filter(w=>w.categoria===cat && (!state.hideUnavailable||isSellable(w))).length;
-    html += `<div class="chip ${state.category===cat?'active':''}" data-cat="${cat}">${cat} <span class="n">${n}</span></div>`;
-  });
-  wrap.innerHTML = html;
-  wrap.querySelectorAll(".chip").forEach(el=>{
-    el.addEventListener("click", ()=>{
-      state.category = el.dataset.cat;
-      renderCategoryChips();
-      renderList();
-    });
-  });
-}
-
-// ---------- render: filter panel contents ----------
-function renderTasteTags(){
-  const wrap = document.getElementById("tasteTags");
-  wrap.innerHTML = TASTE_TAGS_ORDER.map(t=>{
-    const active = state.taste.has(t);
-    return `<div class="tagbtn ${active?'active':''}" data-tag="${t}">${t}</div>`;
-  }).join("");
-  wrap.querySelectorAll(".tagbtn").forEach(el=>{
-    el.addEventListener("click", ()=>{
-      const t = el.dataset.tag;
-      if(state.taste.has(t)) state.taste.delete(t); else state.taste.add(t);
-      renderTasteTags();
-      updateFilterBadge();
-    });
-  });
-}
-
-function renderRegionList(filterText){
-  const wrap = document.getElementById("regionList");
-  const q = normalize(filterText||"");
-  const regs = allRegions.filter(r=>normalize(r).includes(q));
-  if(!regs.length){
-    wrap.innerHTML = `<div class="region-item" style="cursor:default;">Sin coincidencias</div>`;
-    return;
-  }
-  wrap.innerHTML = regs.map(r=>{
-    const checked = state.regions.has(r);
-    return `<label class="region-item ${checked?'checked':''}"><input type="checkbox" data-region="${r.replace(/"/g,'&quot;')}" ${checked?'checked':''}> ${r}</label>`;
-  }).join("");
-  wrap.querySelectorAll("input[data-region]").forEach(inp=>{
-    inp.addEventListener("change", ()=>{
-      const r = inp.dataset.region;
-      if(inp.checked) state.regions.add(r); else state.regions.delete(r);
-      inp.closest(".region-item").classList.toggle("checked", inp.checked);
-      updateFilterBadge();
-    });
-  });
-}
-
-function renderGrapeTags(filterText){
-  const wrap = document.getElementById("grapeTags");
-  const q = normalize(filterText||"");
-  let list = q ? allGrapesSorted.filter(g=>normalize(g).includes(q)).slice(0,40) : topGrapes;
-  wrap.innerHTML = list.map(g=>{
-    const active = state.grapes.has(g);
-    return `<div class="tagbtn ${active?'active':''}" data-grape="${g}">${g} <span style="opacity:.55">${grapeCounts[g]}</span></div>`;
-  }).join("");
-  wrap.querySelectorAll("[data-grape]").forEach(el=>{
-    el.addEventListener("click", ()=>{
-      const g = el.dataset.grape;
-      if(state.grapes.has(g)) state.grapes.delete(g); else state.grapes.add(g);
-      renderGrapeTags(document.getElementById("grapeSearch").value);
-      updateFilterBadge();
-    });
-  });
-}
-
-function updateFilterBadge(){
+function activeFilterCount(){
   let n = state.taste.size + state.regions.size + state.grapes.size;
   if(state.priceMin!=null || state.priceMax!=null) n += 1;
-  const badge = document.getElementById("filterCountBadge");
-  const btn = document.getElementById("openFilters");
-  if(n>0){
-    badge.style.display="inline-block";
-    badge.textContent = n;
-    btn.classList.add("has-active");
-  } else {
-    badge.style.display="none";
-    btn.classList.remove("has-active");
-  }
+  if(state.category!=="Todos") n += 1;
+  return n;
+}
+function tabActive(tab){
+  if(tab==="grape") return state.grapes.size>0;
+  if(tab==="region") return state.regions.size>0;
+  if(tab==="profile") return state.taste.size>0;
+  return state.priceMin!=null || state.priceMax!=null;
 }
 
-// ---------- render: card list ----------
+// ---------- render: wine list ----------
 function tasteTagsHtml(w){
-  if(!w.etiquetasCata.length){
-    return `<span class="tastetag empty">Sin etiqueta de cata todavía</span>`;
-  }
-  return w.etiquetasCata.map(t=>`<span class="tastetag">${t}</span>`).join("");
-}
-// Compact version for the card: max 2 tags + a "+N" overflow indicator, so a
-// wine with a long tasting profile can't push the card taller than the rest.
-function tasteTagsCompactHtml(w){
-  if(!w.etiquetasCata.length){
-    return `<span class="tastetag empty">Sin etiqueta aún</span>`;
-  }
-  const shown = w.etiquetasCata.slice(0,2);
-  const rest = w.etiquetasCata.length - shown.length;
-  return shown.map(t=>`<span class="tastetag">${t}</span>`).join("")
-    + (rest>0 ? `<span class="tastetag more">+${rest}</span>` : "");
+  if(!w.etiquetasCata.length) return `<span class="tastetag empty">Sin etiqueta de cata todavía</span>`;
+  return w.etiquetasCata.map(t=>`<span class="tastetag">${esc(t)}</span>`).join("");
 }
 function grapeTagsHtml(w){
-  if(w.uvasRevisar || !w.uvasTags.length){
-    return `<span class="grapetag unconfirmed">Uva sin confirmar</span>`;
-  }
-  return w.uvasTags.slice(0,6).map(g=>`<span class="grapetag">${g}</span>`).join("");
+  if(w.uvasRevisar || !w.uvasTags.length) return `<span class="grapetag unconfirmed">Uva sin confirmar</span>`;
+  return w.uvasTags.slice(0,6).map(g=>`<span class="grapetag">${esc(g)}</span>`).join("");
 }
-
-// Shared ficha body — used by both the card expand panel and the shortlist
-// drawer, so "review the grapes / sommelier notes" works the same in both.
 function fichaBodyHtml(w){
   const flag = flagFor(w.pais);
   return `
-    <div class="expand-row"><div class="expand-label">País / Año</div>${flag?flag+" ":""}${w.pais||"—"} · ${w.anio||"—"} · ${w.tamano||"75cl"}</div>
-    <div class="expand-row"><div class="expand-label">Etiquetas de cata</div><div class="tagline" style="margin-top:5px;">${tasteTagsHtml(w)}</div></div>
-    <div class="expand-row"><div class="expand-label">Uva</div><div class="tagline" style="margin-top:5px;">${grapeTagsHtml(w)}</div><div style="margin-top:5px;">${w.uva || "No especificada en la ficha original."}</div></div>
-    <div class="expand-row"><div class="expand-label">Notas del sumiller</div>${w.notas || (w.notasSinDatos ? "Esta ficha aún no tiene notas de cata registradas." : "—")}</div>
-    <div class="expand-row"><div class="expand-label">Coste / Precio</div>Coste ${w.coste!=null?fmtPrice(w.coste)+" €":"—"} · PVP ${fmtPrice(w.precio)} €</div>
-  `;
+    <div class="expand-row"><div class="expand-label">País / Año</div>${flag?flag+" ":""}${esc(w.pais||"—")} · ${esc(w.anio||"—")} · ${esc(w.tamano||"75cl")}</div>
+    <div class="expand-row"><div class="expand-label">Etiquetas de cata</div><div class="tagline">${tasteTagsHtml(w)}</div></div>
+    <div class="expand-row"><div class="expand-label">Uva</div><div class="tagline">${grapeTagsHtml(w)}</div><div style="margin-top:6px;">${esc(w.uva || "No especificada en la ficha original.")}</div></div>
+    <div class="expand-row"><div class="expand-label">Notas del sumiller</div>${esc(w.notas || (w.notasSinDatos ? "Esta ficha aún no tiene notas de cata registradas." : "—"))}</div>
+    <div class="expand-row"><div class="expand-label">Coste / Precio</div>Coste ${w.coste!=null?fmtPrice(w.coste)+" €":"—"} · PVP ${fmtPrice(w.precio)} €</div>`;
 }
-
-function cardHtml(w){
-  const s = stockInfo(w.stock);
+function vintageLabel(w){
+  const size = (w.tamano||"").trim();
+  const bigBottle = size && !/^75\s*cl$/i.test(size);
+  return [w.anio, bigBottle?size:""].filter(Boolean).join(" · ");
+}
+function rowHtml(w){
   const inList = state.shortlist.has(w.id);
-  const open = state.openCard===w.id;
-  const meta = catMeta(w.categoria);
-  const flag = flagFor(w.pais);
+  const open = state.openRow===w.id;
+  const stock = lowStockLabel(w);
+  const grapeLine = state.grapes.size && w.uvasTags.length ? `<div class="row-extra">${esc(w.uvasTags.join(", "))}</div>` : "";
+  const profileLine = state.taste.size && w.etiquetasCata.length ? `<div class="row-extra profile">${esc(w.etiquetasCata.join(" · "))}</div>` : "";
+  const place = w.regionNorm || w.pais;
   return `
-  <div class="card ${open?'open':''}" data-id="${w.id}">
-    <div class="card-top">
-      <div class="card-main">
-        <div class="card-name">${w.nombre}</div>
-        <div class="card-producer">${w.productora||"Productor sin especificar"}</div>
-        <div class="card-meta">
-          <span class="meta-cat" title="${w.categoria}"><span class="cat-dot" style="--cat-color:${meta.color}"></span>${w.categoria}</span>
-          <span class="dot-sep">${flag?`<span class="flag">${flag}</span>`:""}${w.regionNorm||w.pais||"—"}</span>
-          <span class="dot-sep">${s.label}</span>
-        </div>
-        <div class="tagline">${tasteTagsCompactHtml(w)}</div>
+  <div class="row ${open?"open":""}" data-id="${w.id}">
+    <div class="row-head" data-toggle="${w.id}">
+      <div class="row-main">
+        <div class="row-title"><span class="row-name">${esc(w.nombre)}</span><span class="row-vintage">${esc(vintageLabel(w))}</span></div>
+        <div class="row-meta">${esc(w.productora||"Productor sin especificar")}${place?` · ${esc(place)}`:""}</div>
+        ${grapeLine}${profileLine}
       </div>
-      <div class="card-price">${fmtPrice(w.precio)}<span class="cur"> €</span></div>
+      <span class="row-dot" title="${esc(w.categoria)}">${dotImg(w.categoria,8)}</span>
+      <div class="row-trail">
+        <div class="row-price">${fmtPrice(w.precio)} €</div>
+        ${stock?`<div class="row-stock">${stock}</div>`:""}
+      </div>
+      <button class="add-btn ${inList?"added":""}" data-shortlist="${w.id}" aria-label="${inList?"Quitar de la shortlist":"Añadir a la shortlist"}"><span class="ic ${inList?"i-check":"i-plus"}"></span></button>
     </div>
-    <div class="card-actions">
-      <button class="ficha-link" data-toggle="${w.id}">${open?"Ocultar ficha ▲":"Ver ficha →"}</button>
-      <button class="select-chip ${inList?'active':''}" data-shortlist="${w.id}">${inList? "✓ Seleccionado" : "Seleccionar +"}</button>
-    </div>
-    <div class="card-expand">
-      <div class="expand-inner">${fichaBodyHtml(w)}</div>
-    </div>
+    <div class="row-expand"><div class="expand-inner">${fichaBodyHtml(w)}</div></div>
   </div>`;
 }
 
 let renderLimit = 60;
 function renderList(){
   const filtered = getFiltered();
-  document.getElementById("resultCount").textContent = filtered.length + (filtered.length===1?" vino":" vinos");
   const wrap = document.getElementById("listWrap");
   if(!filtered.length){
     wrap.innerHTML = `
       <div class="empty-state">
-        <div class="glyph">🍷</div>
         <p><strong>Ningún vino coincide con estos filtros.</strong></p>
         <p>Prueba a quitar alguno o ampliar la búsqueda.</p>
-        <button id="emptyReset">Limpiar filtros</button>
+        <button class="btn btn-primary" id="emptyReset">Limpiar filtros</button>
       </div>`;
     document.getElementById("emptyReset").addEventListener("click", clearAllFilters);
     return;
   }
   const slice = filtered.slice(0, renderLimit);
-  let html = `<div class="card-list">` + slice.map(cardHtml).join("") + `</div>`;
+  let html = `<div class="card-list">` + slice.map(rowHtml).join("") + `</div>`;
   if(filtered.length > renderLimit){
-    html += `<div style="text-align:center;padding:14px 0;"><button class="btn btn-ghost" id="loadMoreBtn" style="flex:none;padding:11px 22px;">Cargar más (${filtered.length - renderLimit} restantes)</button></div>`;
+    html += `<div style="text-align:center;padding:14px 0;"><button class="btn btn-ghost" id="loadMoreBtn" style="flex:none;">Cargar más (${filtered.length - renderLimit} restantes)</button></div>`;
   }
   wrap.innerHTML = html;
-
   wrap.querySelectorAll("[data-toggle]").forEach(el=>{
     el.addEventListener("click", ()=>{
       const id = Number(el.dataset.toggle);
-      state.openCard = state.openCard===id ? null : id;
+      state.openRow = state.openRow===id ? null : id;
       renderList();
     });
   });
   wrap.querySelectorAll("[data-shortlist]").forEach(el=>{
     el.addEventListener("click", (ev)=>{
       ev.stopPropagation();
-      const id = Number(el.dataset.shortlist);
-      toggleShortlist(id);
+      toggleShortlist(Number(el.dataset.shortlist));
     });
   });
   const loadMore = document.getElementById("loadMoreBtn");
   if(loadMore) loadMore.addEventListener("click", ()=>{ renderLimit += 60; renderList(); });
 }
 
-// ---------- shortlist ----------
-function toggleShortlist(id){
-  if(state.shortlist.has(id)){
-    state.shortlist.delete(id);
-    showToast("Quitado de la shortlist");
-  } else {
-    state.shortlist.add(id);
-    showToast("Añadido a la shortlist");
+// ---------- render: dock ----------
+function chipHtml(label, on, attrs, extraCls){
+  return `<button class="chip ${on?"on":""} ${extraCls||""}" ${attrs}>${esc(label)}</button>`;
+}
+function chipsForTab(tab){
+  if(tab==="profile"){
+    const body = BODY_TAGS.map(t=>chipHtml(t, state.taste.has(t), `data-tag="${esc(t)}"`, "wide")).join("");
+    const rest = OTHER_TAGS.map(t=>chipHtml(t, state.taste.has(t), `data-tag="${esc(t)}"`)).join("");
+    return `<div class="chips-body-row">${body}</div><div class="chips">${rest}</div>`;
   }
-  updateShortlistUI();
+  const isGrape = tab==="grape";
+  const grapes = isGrape ? grapesForCategory() : null;
+  const all = isGrape ? grapes.all : allRegions;
+  const common = isGrape ? grapes.common : commonRegions;
+  const sel = isGrape ? state.grapes : state.regions;
+  const attr = isGrape ? "data-grape" : "data-region";
+  const q = normalize(ui.searchText);
+  let list;
+  if(q) list = all.filter(v=>normalize(v).includes(q));
+  else list = ui.expanded ? all : common;
+  if(!list.length) return `<div class="none-found">${T.noMatches}</div>`;
+  let html = list.map(v=>chipHtml(v, sel.has(v), `${attr}="${esc(v)}"`)).join("");
+  if(!q && !ui.expanded) html += `<button class="chip more" data-expand="1">${T.showAll}</button>`;
+  return `<div class="chips">${html}</div>`;
+}
+function priceBody(){
+  return `
+    <div class="price-row">
+      <input type="number" inputmode="decimal" class="price-input" id="priceMin" placeholder="${T.min}" value="${state.priceMin??""}">
+      <span class="price-sep">–</span>
+      <input type="number" inputmode="decimal" class="price-input" id="priceMax" placeholder="${T.max}" value="${state.priceMax??""}">
+    </div>
+    <div class="price-hint">${T.priceHint(priceFloor, priceCeil)}</div>`;
+}
+function segmentedHtml(){
+  return `<div class="seg" role="group" aria-label="Tipo de vino">` + CATEGORY_ORDER.map(cat=>{
+    const on = state.category===cat;
+    return `<button class="seg-item ${on?"on":""}" data-cat="${esc(cat)}" aria-pressed="${on}" aria-label="${esc(cat)}"><span class="seg-ico">${dotImg(cat,20)}</span></button>`;
+  }).join("") + `</div>`;
+}
+function headHtml(){
+  const label = T.headers[ui.tab];
+  const searchable = SEARCHABLE[ui.tab];
+  const searchBtn = searchable ? `<button class="head-btn" id="toggleSearch" aria-label="Buscar"><span class="ic ic-20 i-search"></span></button>` : "";
+  const showX = ui.tab==="grape" || ui.tab==="region";
+  const body = ui.searching
+    ? `<input class="head-search" id="headSearch" type="text" placeholder="${label}" value="${esc(ui.searchText)}" autocomplete="off" autocorrect="off" spellcheck="false">`
+    : `<div class="head-label">${label}</div>`;
+  const xBtn = (showX || ui.searching) ? `<button class="head-btn" id="headX" aria-label="${ui.searching?"Borrar búsqueda":"Cerrar"}"><span class="ic ic-20 i-x"></span></button>` : "";
+  const filterBy = searchable ? `<div class="filter-by">${T.filterBy}</div>` : "";
+  return `<div class="sheet-head">${filterBy}<div class="head-row">${searchBtn}${body}${xBtn}</div>${ui.tab==="grape"?segmentedHtml():""}</div>`;
+}
+function tabsHtml(){
+  return `<div class="tabs" role="tablist">` + TABS.map(t=>{
+    const sel = ui.open && ui.tab===t;
+    return `<button class="tab ${sel?"sel":""} ${tabActive(t)?"active":""}" role="tab" aria-selected="${sel}" data-tab="${t}"><span class="ico"><span class="ic ${TAB_ICON[t]}"></span></span>${T.tabs[t]}</button>`;
+  }).join("") + `</div>`;
+}
+function contentHtml(){
+  if(ui.tab==="price") return priceBody();
+  return chipsForTab(ui.tab);
+}
+
+function renderDock(){
+  const dock = document.getElementById("dock");
+  const nSel = state.shortlist.size;
+  const nFilt = activeFilterCount();
+  let html = "";
+  if(ui.open){
+    const expandedCls = ui.expanded && ui.tab!=="profile" && ui.tab!=="price" ? " expanded" : "";
+    html += `<div class="sheet${expandedCls}">
+      <button class="grabber" id="grabber" aria-label="Cerrar filtros"></button>
+      ${headHtml()}
+      <div class="sheet-content" id="sheetContent">${contentHtml()}</div>
+      ${expandedCls?`<div class="fade-bottom"></div><button class="show-less" id="showLess">${T.showLess}</button>`:""}
+      ${tabsHtml()}
+    </div>`;
+  } else {
+    html += `<div class="sheet ${nSel?"stacked":""}">
+      <button class="grabber" id="grabber" aria-label="Abrir filtros"></button>
+      <div class="sheet-head"><div class="head-row" id="minBar" style="cursor:pointer;">
+        ${nFilt
+          ? `<div class="count-chip" style="background:#fff;">${nFilt}</div><div class="head-label muted">${T.filtersActive(nFilt)}</div><button class="head-btn" id="clearFilters" aria-label="Quitar filtros"><span class="ic ic-20 i-x"></span></button>`
+          : `<div class="head-label muted">${T.noFilters}</div>`}
+      </div></div>
+      ${tabsHtml()}
+    </div>`;
+    if(nSel){
+      html += `<div class="sheet green">
+        <div class="sheet-head" style="padding-top:16px;"><div class="head-row" id="shortBar">
+          <div class="count-chip">${nSel}</div><div class="head-label">${T.inShortlist(nSel)}</div>
+          <button class="head-btn" id="clearShortBar" aria-label="Vaciar shortlist"><span class="ic ic-20 i-x"></span></button>
+        </div></div>
+      </div>`;
+    }
+  }
+  dock.innerHTML = html;
+  bindDock();
+  syncDockHeight();
+}
+// The minimized dock has no .tabs row; keep the compact bar reading like the Figma "Minimized" frame.
+function syncDockHeight(){
+  const dock = document.getElementById("dock");
+  const h = dock.offsetHeight;
+  document.documentElement.style.setProperty("--dock-h", (ui.open ? Math.min(h, 140) : h) + "px");
+}
+function bindDock(){
+  const $ = id => document.getElementById(id);
+  const on = (id, fn) => { const el=$(id); if(el) el.addEventListener("click", fn); };
+
+  on("grabber", ()=>{ ui.open ? closeSheet() : openSheet(ui.tab); });
+  on("minBar", (e)=>{ if(e.target.closest("#clearFilters")) return; openSheet(ui.tab); });
+  on("clearFilters", (e)=>{ e.stopPropagation(); clearAllFilters(); });
+  on("shortBar", (e)=>{
+    if(e.target.closest("#clearShortBar")) return;
+    renderShortlistDrawer();
+    $("shortlistDrawer").classList.add("open");
+  });
+  on("clearShortBar", (e)=>{
+    e.stopPropagation();
+    state.shortlist.clear();
+    updateAfterShortlist();
+    showToast("Shortlist vaciada");
+  });
+
+  document.querySelectorAll("#dock [data-tab]").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      const t = el.dataset.tab;
+      if(ui.open && ui.tab===t){ closeSheet(); return; }
+      openSheet(t);
+    });
+  });
+  document.querySelectorAll("#dock [data-cat]").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      const c = el.dataset.cat;
+      state.category = state.category===c ? "Todos" : c;
+      pruneGrapesToCategory();
+      renderLimit = 60;
+      renderDock(); renderList();
+    });
+  });
+
+  on("toggleSearch", ()=>{
+    ui.searching = !ui.searching;
+    if(!ui.searching) ui.searchText = "";
+    renderDock();
+    const inp = $("headSearch"); if(inp) inp.focus();
+  });
+  on("headX", ()=>{
+    if(ui.searching){ ui.searching=false; ui.searchText=""; renderDock(); }
+    else closeSheet();
+  });
+  const hs = $("headSearch");
+  if(hs) hs.addEventListener("input", (e)=>{
+    ui.searchText = e.target.value;
+    $("sheetContent").innerHTML = contentHtml();
+    bindChips();
+  });
+  on("showLess", ()=>{ ui.expanded=false; renderDock(); });
+
+  const pMin = $("priceMin"), pMax = $("priceMax");
+  if(pMin) pMin.addEventListener("input", (e)=>{ state.priceMin = e.target.value===""?null:Number(e.target.value); afterPriceChange(); });
+  if(pMax) pMax.addEventListener("input", (e)=>{ state.priceMax = e.target.value===""?null:Number(e.target.value); afterPriceChange(); });
+
+  bindChips();
+}
+function afterPriceChange(){
+  renderLimit = 60;
+  renderList();
+  // refresh only the tab indicators so the inputs keep focus
+  document.querySelectorAll("#dock [data-tab]").forEach(el=>el.classList.toggle("active", tabActive(el.dataset.tab)));
+}
+function bindChips(){
+  const root = document.getElementById("sheetContent");
+  if(!root) return;
+  const toggle = (set, v) => { set.has(v) ? set.delete(v) : set.add(v); };
+  root.querySelectorAll("[data-grape]").forEach(el=>el.addEventListener("click", ()=>{ toggle(state.grapes, el.dataset.grape); chipChanged(); }));
+  root.querySelectorAll("[data-region]").forEach(el=>el.addEventListener("click", ()=>{ toggle(state.regions, el.dataset.region); chipChanged(); }));
+  root.querySelectorAll("[data-tag]").forEach(el=>el.addEventListener("click", ()=>{ toggle(state.taste, el.dataset.tag); chipChanged(); }));
+  root.querySelectorAll("[data-expand]").forEach(el=>el.addEventListener("click", ()=>{ ui.expanded=true; renderDock(); }));
+}
+function chipChanged(){
+  renderLimit = 60;
+  const scroller = document.getElementById("sheetContent");
+  const top = scroller ? scroller.scrollTop : 0;
+  renderDock();
+  const s2 = document.getElementById("sheetContent");
+  if(s2) s2.scrollTop = top;
   renderList();
 }
-function updateShortlistUI(){
-  const n = state.shortlist.size;
-  const fab = document.getElementById("fabShortlist");
-  document.getElementById("fabCount").textContent = n;
-  fab.classList.toggle("show", n>0);
+function openSheet(tab){
+  if(tab!==ui.tab){ ui.searching=false; ui.searchText=""; ui.expanded=false; }
+  ui.tab = tab; ui.open = true;
+  renderDock();
+}
+function closeSheet(){
+  ui.open = false; ui.expanded = false; ui.searching = false; ui.searchText = "";
+  renderDock();
+}
+function clearAllFilters(){
+  state.taste.clear(); state.regions.clear(); state.grapes.clear();
+  state.priceMin = null; state.priceMax = null; state.category = "Todos";
+  renderLimit = 60;
+  renderDock(); renderList();
+}
+
+// ---------- shortlist ----------
+function toggleShortlist(id){
+  if(state.shortlist.has(id)){ state.shortlist.delete(id); showToast("Quitado de la shortlist"); }
+  else { state.shortlist.add(id); showToast("Añadido a la shortlist"); }
+  updateAfterShortlist();
+}
+function updateAfterShortlist(){
+  renderDock();
+  renderList();
+  const drawer = document.getElementById("shortlistDrawer");
+  if(drawer.classList.contains("open")) renderShortlistDrawer();
 }
 function renderShortlistDrawer(){
   const body = document.getElementById("shortlistBody");
   const items = WINES.filter(w=>state.shortlist.has(w.id));
   if(!items.length){
-    body.innerHTML = `<div class="sl-empty">Aún no has añadido vinos. Toca “Seleccionar +” en una ficha para guardarla aquí.</div>`;
+    body.innerHTML = `<div class="sl-empty">Aún no has añadido vinos. Toca “+” en un vino para guardarlo aquí.</div>`;
     return;
   }
   body.innerHTML = items.map(w=>{
     const open = state.openSlRow===w.id;
     return `
-    <div class="slrow ${open?'open':''}" data-slid="${w.id}">
-      <div class="slrow-head">
-        <div class="slrow-main">
-          <div class="slrow-name">${w.nombre}</div>
-          <div class="slrow-sub">${w.productora||"Productor sin especificar"}</div>
-          <div class="slrow-tags">${tasteTagsHtml(w)}</div>
+    <div class="row slrow ${open?"open":""}" data-slid="${w.id}">
+      <div class="row-head" data-sltoggle="${w.id}">
+        <div class="row-main">
+          <div class="row-title"><span class="row-name">${esc(w.nombre)}</span><span class="row-vintage">${esc(vintageLabel(w))}</span></div>
+          <div class="row-meta">${esc(w.productora||"Productor sin especificar")}</div>
+          <div class="tagline">${tasteTagsHtml(w)}</div>
         </div>
-        <div class="slrow-side">
-          <div class="slrow-price">${fmtPrice(w.precio)} €</div>
-          <button class="slrow-remove" data-remove="${w.id}" aria-label="Quitar de la shortlist">×</button>
-        </div>
+        <span class="row-dot" title="${esc(w.categoria)}">${dotImg(w.categoria,8)}</span>
+        <div class="row-trail"><div class="row-price">${fmtPrice(w.precio)} €</div></div>
+        <button class="slrow-remove" data-remove="${w.id}" aria-label="Quitar de la shortlist"><span class="ic ic-20 i-x"></span></button>
       </div>
-      <button class="ficha-link" data-sltoggle="${w.id}">${open?"Ocultar ficha ▲":"Ver ficha (uva, notas del sumiller) →"}</button>
-      <div class="card-expand">
-        <div class="expand-inner">${fichaBodyHtml(w)}</div>
-      </div>
+      <div class="row-expand"><div class="expand-inner">${fichaBodyHtml(w)}</div></div>
     </div>`;
   }).join("");
   body.querySelectorAll("[data-remove]").forEach(el=>{
     el.addEventListener("click", (ev)=>{
       ev.stopPropagation();
       state.shortlist.delete(Number(el.dataset.remove));
-      updateShortlistUI();
-      renderShortlistDrawer();
-      renderList();
+      updateAfterShortlist();
     });
   });
   body.querySelectorAll("[data-sltoggle]").forEach(el=>{
@@ -864,102 +807,20 @@ function showToast(msg){
   toastTimer = setTimeout(()=>t.classList.remove("show"), 1400);
 }
 
-// ---------- filter panel open/close ----------
-function openFilterPanel(){
-  document.getElementById("filterPanel").classList.add("open");
-  renderRegionList(document.getElementById("regionSearch").value);
-  renderGrapeTags(document.getElementById("grapeSearch").value);
-}
-function closeFilterPanel(){
-  document.getElementById("filterPanel").classList.remove("open");
-}
-function clearAllFilters(){
-  state.taste.clear();
-  state.regions.clear();
-  state.grapes.clear();
-  state.priceMin = null;
-  state.priceMax = null;
-  document.getElementById("priceMin").value = "";
-  document.getElementById("priceMax").value = "";
-  document.getElementById("regionSearch").value = "";
-  document.getElementById("grapeSearch").value = "";
-  renderTasteTags();
-  renderRegionList("");
-  renderGrapeTags("");
-  updateFilterBadge();
-  renderList();
-}
-
 // ---------- init ----------
 function init(){
-  document.getElementById("priceHint").textContent = `Rango en carta: ${priceFloor}–${priceCeil} €`;
-  renderCategoryChips();
-  renderTasteTags();
-  renderRegionList("");
-  renderGrapeTags("");
+  renderDock();
   renderList();
-  updateShortlistUI();
 
-  document.getElementById("searchInput").addEventListener("input", (e)=>{
-    state.query = e.target.value;
-    document.getElementById("clearSearch").classList.toggle("show", !!state.query);
-    renderLimit = 60;
-    renderList();
-  });
-  document.getElementById("clearSearch").addEventListener("click", ()=>{
-    document.getElementById("searchInput").value="";
-    state.query="";
-    document.getElementById("clearSearch").classList.remove("show");
-    renderList();
-  });
-
-  document.getElementById("hideUnavailable").addEventListener("change", (e)=>{
-    state.hideUnavailable = e.target.checked;
-    renderCategoryChips();
-    renderList();
-  });
-
-  document.getElementById("openFilters").addEventListener("click", openFilterPanel);
-  document.getElementById("closeFilters").addEventListener("click", closeFilterPanel);
-  document.getElementById("applyFilters").addEventListener("click", ()=>{ closeFilterPanel(); renderLimit=60; renderList(); });
-  document.getElementById("filterPanel").addEventListener("click", (e)=>{ if(e.target.id==="filterPanel") closeFilterPanel(); });
-  document.getElementById("clearAllFilters").addEventListener("click", clearAllFilters);
-
-  document.getElementById("resetPrice").addEventListener("click", ()=>{
-    state.priceMin=null; state.priceMax=null;
-    document.getElementById("priceMin").value=""; document.getElementById("priceMax").value="";
-    updateFilterBadge();
-  });
-  document.getElementById("resetTaste").addEventListener("click", ()=>{ state.taste.clear(); renderTasteTags(); updateFilterBadge(); });
-  document.getElementById("resetRegion").addEventListener("click", ()=>{ state.regions.clear(); renderRegionList(document.getElementById("regionSearch").value); updateFilterBadge(); });
-  document.getElementById("resetGrape").addEventListener("click", ()=>{ state.grapes.clear(); renderGrapeTags(document.getElementById("grapeSearch").value); updateFilterBadge(); });
-
-  document.getElementById("priceMin").addEventListener("input", (e)=>{
-    state.priceMin = e.target.value===""?null:Number(e.target.value);
-    updateFilterBadge();
-  });
-  document.getElementById("priceMax").addEventListener("input", (e)=>{
-    state.priceMax = e.target.value===""?null:Number(e.target.value);
-    updateFilterBadge();
-  });
-  document.getElementById("regionSearch").addEventListener("input", (e)=> renderRegionList(e.target.value));
-  document.getElementById("grapeSearch").addEventListener("input", (e)=> renderGrapeTags(e.target.value));
-
-  document.getElementById("fabShortlist").addEventListener("click", ()=>{
-    renderShortlistDrawer();
-    document.getElementById("shortlistDrawer").classList.add("open");
-  });
   document.getElementById("closeDrawer").addEventListener("click", ()=>{
     document.getElementById("shortlistDrawer").classList.remove("open");
   });
   document.getElementById("shortlistDrawer").addEventListener("click", (e)=>{
-    if(e.target.id==="shortlistDrawer") document.getElementById("shortlistDrawer").classList.remove("open");
+    if(e.target.id==="shortlistDrawer") e.target.classList.remove("open");
   });
   document.getElementById("clearShortlist").addEventListener("click", ()=>{
     state.shortlist.clear();
-    updateShortlistUI();
-    renderShortlistDrawer();
-    renderList();
+    updateAfterShortlist();
   });
   document.getElementById("copyShortlist").addEventListener("click", ()=>{
     const items = WINES.filter(w=>state.shortlist.has(w.id));
@@ -970,13 +831,13 @@ function init(){
       showToast(items.length? "No se pudo copiar" : "La shortlist está vacía");
     }
   });
+  if(window.ResizeObserver) new ResizeObserver(syncDockHeight).observe(document.getElementById("dock"));
 }
 
 // ---------- boot (loads data from the live sheet via /api/wines) ----------
 async function boot(){
   document.getElementById("listWrap").innerHTML = `
     <div class="empty-state">
-      <div class="glyph">🍷</div>
       <p><strong>Cargando la carta…</strong></p>
       <p>Sincronizando con la hoja de datos.</p>
     </div>`;
@@ -989,16 +850,15 @@ async function boot(){
   } catch(err){
     document.getElementById("listWrap").innerHTML = `
       <div class="empty-state">
-        <div class="glyph">⚠️</div>
         <p><strong>No se pudo cargar la carta.</strong></p>
         <p>Revisa la conexión y vuelve a intentarlo.</p>
-        <button id="retryBoot">Reintentar</button>
+        <button class="btn btn-primary" id="retryBoot">Reintentar</button>
       </div>`;
     document.getElementById("retryBoot").addEventListener("click", boot);
     return;
   }
   computeDerived();
-  init();
+  if(!window.__inited){ window.__inited = true; init(); } else { renderDock(); renderList(); }
 }
 boot();
 </script>
