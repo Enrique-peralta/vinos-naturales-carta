@@ -235,6 +235,42 @@ main{padding:max(16px,env(safe-area-inset-top)) 16px calc(var(--dock-h) + 16px);
 }
 .toast.show{opacity:1;}
 
+/* TABLET + DESKTOP: side panel with every filter visible */
+.wide-title,.panel{display:none;}
+@media (min-width:768px){
+  .app{max-width:none;display:grid;grid-template-columns:minmax(300px,360px) 1fr;align-items:start;}
+  .panel:not([hidden]){
+    display:block;position:sticky;top:0;height:100vh;height:100dvh;overflow-y:auto;
+    background:var(--bg-subtle);padding:24px 16px 32px;border-radius:0 var(--radius-xl) var(--radius-xl) 0;
+  }
+  .panel-head{display:flex;align-items:center;justify-content:space-between;padding:0 8px 16px;}
+  .panel-head h2{margin:0;font-size:17px;font-weight:500;}
+  .panel-clear{background:none;border:0;padding:0;color:var(--text-muted);font-weight:500;display:flex;align-items:center;gap:8px;}
+  .count-chip.dark{background:var(--text);color:#fff;}
+  .panel-sec{padding:0 0 24px;}
+  .panel-sec-head h3{margin:0 8px 8px;font-size:var(--fs-sm);line-height:var(--lh-sm);font-weight:500;color:var(--text-subtle);}
+  .panel-sec .seg{margin:0;}
+  .panel-search{display:flex;align-items:center;gap:12px;padding:8px 16px;margin-bottom:12px;background:var(--bg);border-radius:var(--radius-md);color:var(--text-subtle);}
+  .panel-search input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:var(--text);padding:0;}
+  .panel-search input::placeholder{color:var(--text-subtle);}
+  .panel .none-found{padding:8px;}
+  main{padding:32px 32px 112px;}
+  .wide-title{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin:0 0 16px;padding:0 16px;}
+  .wide-title h1{margin:0;font-size:22px;line-height:28px;font-weight:500;}
+  .wide-title span{color:var(--text-subtle);font-size:var(--fs-sm);}
+  .card-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));column-gap:24px;align-content:start;}
+  .row-head{padding-right:0;}
+  .dock.wide{left:auto;right:24px;bottom:24px;transform:none;max-width:420px;width:calc(100% - 48px);}
+  .dock.wide .sheet.green{margin:0;border-radius:var(--radius-xl);padding-bottom:4px;box-shadow:0 12px 32px rgba(26,25,23,.2);}
+  .dock.wide .sheet.green .grabber{display:none;}
+  .dock.wide .sheet.green .sheet-head{padding-top:4px !important;}
+  .toast{left:calc(360px + (100vw - 360px)/2);bottom:96px;}
+  .drawer-sheet{top:6vh;border-radius:var(--radius-xl);bottom:6vh;max-width:560px;}
+}
+@media (min-width:1280px){
+  .app{grid-template-columns:380px 1fr;}
+  .card-list{grid-template-columns:repeat(auto-fill,minmax(440px,1fr));}
+}
 @media (hover:hover){
   .chip:not(.on):hover{background:#fbfbfa;}
   .add-btn:not(.added):hover{background:var(--bg-subtle);}
@@ -243,7 +279,8 @@ main{padding:max(16px,env(safe-area-inset-top)) 16px calc(var(--dock-h) + 16px);
 </head>
 <body>
 <div class="app">
-  <main><div id="listWrap"></div></main>
+  <aside class="panel" id="panel" hidden></aside>
+  <main><div class="wide-title"><h1>Carta de vinos naturales</h1><span id="resultCount"></span></div><div id="listWrap"></div></main>
   <div class="dock" id="dock"></div>
 </div>
 
@@ -278,6 +315,7 @@ const T = {
   max: "Max",
   priceHint: (lo,hi)=>`Rango en carta: ${lo}–${hi} €`,
   noFilters: "Filtros",
+  clearAll: "Quitar",
   filtersActive: n => n===1 ? "filtro activo" : "filtros activos",
   inShortlist: n => n===1 ? "vino en la shortlist" : "vinos en la shortlist",
   noMatches: "Sin coincidencias",
@@ -330,7 +368,9 @@ const state = {
   openRow: null,
   openSlRow: null,
 };
-const ui = { open:false, tab:"grape", expanded:false, searching:false, searchText:"" };
+const ui = { open:false, tab:"grape", expanded:false, searching:false, searchText:"", exp:{grape:false,region:false}, wq:{grape:"",region:""} };
+const wideMq = window.matchMedia("(min-width:768px)");
+const isWide = () => wideMq.matches;
 
 // ---------- helpers ----------
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
@@ -506,6 +546,7 @@ let renderLimit = 60;
 function renderList(){
   const filtered = getFiltered();
   const wrap = document.getElementById("listWrap");
+  document.getElementById("resultCount").textContent = filtered.length + (filtered.length===1?" vino":" vinos");
   if(!filtered.length){
     wrap.innerHTML = `
       <div class="empty-state">
@@ -543,7 +584,10 @@ function renderList(){
 function chipHtml(label, on, attrs, extraCls){
   return `<button class="chip ${on?"on":""} ${extraCls||""}" ${attrs}>${esc(label)}</button>`;
 }
-function chipsForTab(tab){
+function chipsForTab(tab, opts){
+  const expanded = opts ? opts.expanded : ui.expanded;
+  const query = opts ? opts.query : ui.searchText;
+  const inlineLess = !!(opts && opts.inlineLess);
   if(tab==="profile"){
     const body = BODY_TAGS.map(t=>chipHtml(t, state.taste.has(t), `data-tag="${esc(t)}"`, "wide")).join("");
     const rest = OTHER_TAGS.map(t=>chipHtml(t, state.taste.has(t), `data-tag="${esc(t)}"`)).join("");
@@ -555,13 +599,14 @@ function chipsForTab(tab){
   const common = isGrape ? grapes.common : commonRegions;
   const sel = isGrape ? state.grapes : state.regions;
   const attr = isGrape ? "data-grape" : "data-region";
-  const q = normalize(ui.searchText);
+  const q = normalize(query);
   let list;
   if(q) list = all.filter(v=>normalize(v).includes(q));
-  else list = ui.expanded ? all : common;
+  else list = expanded ? all : common;
   if(!list.length) return `<div class="none-found">${T.noMatches}</div>`;
   let html = list.map(v=>chipHtml(v, sel.has(v), `${attr}="${esc(v)}"`)).join("");
-  if(!q && !ui.expanded) html += `<button class="chip more" data-expand="1">${T.showAll}</button>`;
+  if(!q && !expanded) html += `<button class="chip more" data-expand="${tab}">${T.showAll}</button>`;
+  if(!q && expanded && inlineLess) html += `<button class="chip more" data-collapse="${tab}">${T.showLess}</button>`;
   return `<div class="chips">${html}</div>`;
 }
 function priceBody(){
@@ -602,11 +647,53 @@ function contentHtml(){
   return chipsForTab(ui.tab);
 }
 
+function shortBarHtml(nSel){
+  return `<div class="sheet green">
+        <div class="sheet-head" style="padding-top:16px;"><div class="head-row" id="shortBar">
+          <div class="count-chip">${nSel}</div><div class="head-label">${T.inShortlist(nSel)}</div>
+          <button class="head-btn" id="clearShortBar" aria-label="Vaciar shortlist"><span class="ic ic-20 i-x"></span></button>
+        </div></div>
+      </div>`;
+}
+// Tablet / desktop: filters live in a side panel, all sections visible at once.
+function panelSection(tab, body, extra){
+  return `<section class="panel-sec"><div class="panel-sec-head"><h3>${T.headers[tab]}</h3>${extra||""}</div>${body}</section>`;
+}
+function wideSearchHtml(tab){
+  return `<label class="panel-search"><span class="ic ic-20 i-search"></span><input type="text" data-wsearch="${tab}" placeholder="${T.headers[tab]}" value="${esc(ui.wq[tab])}" autocomplete="off" spellcheck="false"></label>`;
+}
+function chipsBlock(tab){
+  return `<div data-chips="${tab}">${chipsForTab(tab,{expanded:ui.exp[tab], query:ui.wq[tab], inlineLess:true})}</div>`;
+}
+function renderPanel(){
+  const nFilt = activeFilterCount();
+  const panel = document.getElementById("panel");
+  const top = panel.scrollTop;
+  panel.innerHTML = `
+    <div class="panel-head"><h2>${T.noFilters}</h2>${nFilt?`<button class="panel-clear" id="clearFilters">${T.clearAll} <span class="count-chip dark">${nFilt}</span></button>`:""}</div>
+    <section class="panel-sec">${segmentedHtml()}</section>
+    ${panelSection("grape", wideSearchHtml("grape")+chipsBlock("grape"))}
+    ${panelSection("region", wideSearchHtml("region")+chipsBlock("region"))}
+    ${panelSection("profile", chipsForTab("profile"))}
+    ${panelSection("price", priceBody())}`;
+  panel.scrollTop = top;
+}
+
 function renderDock(){
   const dock = document.getElementById("dock");
   const nSel = state.shortlist.size;
   const nFilt = activeFilterCount();
   let html = "";
+  const wide = isWide();
+  dock.classList.toggle("wide", wide);
+  document.getElementById("panel").hidden = !wide;
+  if(wide){
+    renderPanel();
+    dock.innerHTML = nSel ? shortBarHtml(nSel) : "";
+    bindDock();
+    syncDockHeight();
+    return;
+  }
   if(ui.open){
     const expandedCls = ui.expanded && ui.tab!=="profile" && ui.tab!=="price" ? " expanded" : "";
     html += `<div class="sheet${expandedCls}">
@@ -626,14 +713,7 @@ function renderDock(){
       </div></div>
       ${tabsHtml()}
     </div>`;
-    if(nSel){
-      html += `<div class="sheet green">
-        <div class="sheet-head" style="padding-top:16px;"><div class="head-row" id="shortBar">
-          <div class="count-chip">${nSel}</div><div class="head-label">${T.inShortlist(nSel)}</div>
-          <button class="head-btn" id="clearShortBar" aria-label="Vaciar shortlist"><span class="ic ic-20 i-x"></span></button>
-        </div></div>
-      </div>`;
-    }
+    if(nSel) html += shortBarHtml(nSel);
   }
   dock.innerHTML = html;
   bindDock();
@@ -671,7 +751,7 @@ function bindDock(){
       openSheet(t);
     });
   });
-  document.querySelectorAll("#dock [data-cat]").forEach(el=>{
+  document.querySelectorAll("#dock [data-cat], #panel [data-cat]").forEach(el=>{
     el.addEventListener("click", ()=>{
       const c = el.dataset.cat;
       state.category = state.category===c ? "Todos" : c;
@@ -703,6 +783,13 @@ function bindDock(){
   if(pMin) pMin.addEventListener("input", (e)=>{ state.priceMin = e.target.value===""?null:Number(e.target.value); afterPriceChange(); });
   if(pMax) pMax.addEventListener("input", (e)=>{ state.priceMax = e.target.value===""?null:Number(e.target.value); afterPriceChange(); });
 
+  document.querySelectorAll("[data-wsearch]").forEach(inp=>inp.addEventListener("input", (e)=>{
+    const tab = inp.dataset.wsearch;
+    ui.wq[tab] = e.target.value;
+    document.querySelector(`[data-chips="${tab}"]`).innerHTML = chipsForTab(tab,{expanded:ui.exp[tab], query:ui.wq[tab], inlineLess:true});
+    bindChips();
+  }));
+
   bindChips();
 }
 function afterPriceChange(){
@@ -712,13 +799,17 @@ function afterPriceChange(){
   document.querySelectorAll("#dock [data-tab]").forEach(el=>el.classList.toggle("active", tabActive(el.dataset.tab)));
 }
 function bindChips(){
-  const root = document.getElementById("sheetContent");
+  const root = document.getElementById("sheetContent") || (isWide() ? document.getElementById("panel") : null);
   if(!root) return;
   const toggle = (set, v) => { set.has(v) ? set.delete(v) : set.add(v); };
   root.querySelectorAll("[data-grape]").forEach(el=>el.addEventListener("click", ()=>{ toggle(state.grapes, el.dataset.grape); chipChanged(); }));
   root.querySelectorAll("[data-region]").forEach(el=>el.addEventListener("click", ()=>{ toggle(state.regions, el.dataset.region); chipChanged(); }));
   root.querySelectorAll("[data-tag]").forEach(el=>el.addEventListener("click", ()=>{ toggle(state.taste, el.dataset.tag); chipChanged(); }));
-  root.querySelectorAll("[data-expand]").forEach(el=>el.addEventListener("click", ()=>{ ui.expanded=true; renderDock(); }));
+  root.querySelectorAll("[data-expand]").forEach(el=>el.addEventListener("click", ()=>{
+    if(isWide()) ui.exp[el.dataset.expand]=true; else ui.expanded=true;
+    renderDock();
+  }));
+  root.querySelectorAll("[data-collapse]").forEach(el=>el.addEventListener("click", ()=>{ ui.exp[el.dataset.collapse]=false; renderDock(); }));
 }
 function chipChanged(){
   renderLimit = 60;
@@ -832,6 +923,7 @@ function init(){
     }
   });
   if(window.ResizeObserver) new ResizeObserver(syncDockHeight).observe(document.getElementById("dock"));
+  wideMq.addEventListener("change", ()=>{ closeSheet(); });
 }
 
 // ---------- boot (loads data from the live sheet via /api/wines) ----------
