@@ -52,6 +52,7 @@ button{cursor:pointer;}
 .i-x{--icon:url(assets/icons/circle-x.svg);}
 .i-plus{--icon:url(assets/icons/plus.svg);}
 .i-check{--icon:url(assets/icons/check.svg);}
+.i-chev{--icon:url(assets/icons/chevron-down.svg);}
 .i-grape{--icon:url(assets/icons/grape.svg);}
 .i-pin{--icon:url(assets/icons/map-pin.svg);}
 .i-scale{--icon:url(assets/icons/scale.svg);}
@@ -247,8 +248,18 @@ main{padding:max(16px,env(safe-area-inset-top)) 16px calc(var(--dock-h) + 16px);
   .panel-head h2{margin:0;font-size:17px;font-weight:500;}
   .panel-clear{background:none;border:0;padding:0;color:var(--text-muted);font-weight:500;display:flex;align-items:center;gap:8px;}
   .count-chip.dark{background:var(--text);color:#fff;}
-  .panel-sec{padding:0 0 24px;}
-  .panel-sec-head h3{margin:0 8px 8px;font-size:var(--fs-sm);line-height:var(--lh-sm);font-weight:500;color:var(--text-subtle);}
+  .panel-sec{border-top:1px solid var(--border);}
+  .panel-sec:last-child{border-bottom:1px solid var(--border);}
+  .acc-head{
+    width:100%;display:flex;align-items:center;gap:8px;padding:14px 8px;background:none;border:0;
+    text-align:left;color:var(--text);
+  }
+  .acc-title{font-weight:500;}
+  .acc-sum{margin-left:auto;color:var(--text-subtle);font-size:var(--fs-sm);line-height:var(--lh-sm);max-width:55%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .acc-chev{color:var(--text-subtle);transition:transform .18s ease;}
+  .acc-head .acc-title + .acc-chev{margin-left:auto;}
+  .panel-sec.open .acc-chev{transform:rotate(180deg);}
+  .acc-body{padding:0 0 20px;}
   .panel-sec .seg{margin:0;}
   .panel-search{display:flex;align-items:center;gap:12px;padding:8px 16px;margin-bottom:12px;background:var(--bg);border-radius:var(--radius-md);color:var(--text-subtle);}
   .panel-search input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:var(--text);padding:0;}
@@ -316,6 +327,7 @@ const T = {
   priceHint: (lo,hi)=>`Rango en carta: ${lo}–${hi} €`,
   noFilters: "Filtros",
   clearAll: "Quitar",
+  typeTitle: "Tipo de vino",
   filtersActive: n => n===1 ? "filtro activo" : "filtros activos",
   inShortlist: n => n===1 ? "vino en la shortlist" : "vinos en la shortlist",
   noMatches: "Sin coincidencias",
@@ -368,7 +380,7 @@ const state = {
   openRow: null,
   openSlRow: null,
 };
-const ui = { open:false, tab:"grape", expanded:false, searching:false, searchText:"", exp:{grape:false,region:false}, wq:{grape:"",region:""} };
+const ui = { open:false, tab:"grape", expanded:false, searching:false, searchText:"", acc:{type:false,grape:false,region:false,profile:false,price:false}, exp:{grape:false,region:false}, wq:{grape:"",region:""} };
 const wideMq = window.matchMedia("(min-width:768px)");
 const isWide = () => wideMq.matches;
 
@@ -656,8 +668,30 @@ function shortBarHtml(nSel){
       </div>`;
 }
 // Tablet / desktop: filters live in a side panel, all sections visible at once.
-function panelSection(tab, body, extra){
-  return `<section class="panel-sec"><div class="panel-sec-head"><h3>${T.headers[tab]}</h3>${extra||""}</div>${body}</section>`;
+// Collapsible section: header always visible with a one-line summary of what is selected.
+function accSummary(set){
+  const a=[...set];
+  return a.length ? a[0] + (a.length>1 ? ` +${a.length-1}` : "") : "";
+}
+function panelSummary(key){
+  if(key==="type") return state.category!=="Todos" ? state.category : "";
+  if(key==="grape") return accSummary(state.grapes);
+  if(key==="region") return accSummary(state.regions);
+  if(key==="profile") return accSummary(state.taste);
+  if(state.priceMin!=null || state.priceMax!=null) return `${state.priceMin??""}–${state.priceMax??""} €`;
+  return "";
+}
+function panelSection(key, title, body){
+  const open = ui.acc[key];
+  const sum = panelSummary(key);
+  return `<section class="panel-sec ${open?"open":""}">
+    <button class="acc-head" data-acc="${key}" aria-expanded="${open}">
+      <span class="acc-title">${title}</span>
+      ${sum?`<span class="acc-sum">${esc(sum)}</span>`:""}
+      <span class="ic ic-20 i-chev acc-chev"></span>
+    </button>
+    ${open?`<div class="acc-body">${body}</div>`:""}
+  </section>`;
 }
 function wideSearchHtml(tab){
   return `<label class="panel-search"><span class="ic ic-20 i-search"></span><input type="text" data-wsearch="${tab}" placeholder="${T.headers[tab]}" value="${esc(ui.wq[tab])}" autocomplete="off" spellcheck="false"></label>`;
@@ -671,11 +705,11 @@ function renderPanel(){
   const top = panel.scrollTop;
   panel.innerHTML = `
     <div class="panel-head"><h2>${T.noFilters}</h2>${nFilt?`<button class="panel-clear" id="clearFilters">${T.clearAll} <span class="count-chip dark">${nFilt}</span></button>`:""}</div>
-    <section class="panel-sec">${segmentedHtml()}</section>
-    ${panelSection("grape", wideSearchHtml("grape")+chipsBlock("grape"))}
-    ${panelSection("region", wideSearchHtml("region")+chipsBlock("region"))}
-    ${panelSection("profile", chipsForTab("profile"))}
-    ${panelSection("price", priceBody())}`;
+    ${panelSection("type", T.typeTitle, segmentedHtml())}
+    ${panelSection("grape", T.headers.grape, wideSearchHtml("grape")+chipsBlock("grape"))}
+    ${panelSection("region", T.headers.region, wideSearchHtml("region")+chipsBlock("region"))}
+    ${panelSection("profile", T.headers.profile, chipsForTab("profile"))}
+    ${panelSection("price", T.headers.price, priceBody())}`;
   panel.scrollTop = top;
 }
 
@@ -782,6 +816,11 @@ function bindDock(){
   const pMin = $("priceMin"), pMax = $("priceMax");
   if(pMin) pMin.addEventListener("input", (e)=>{ state.priceMin = e.target.value===""?null:Number(e.target.value); afterPriceChange(); });
   if(pMax) pMax.addEventListener("input", (e)=>{ state.priceMax = e.target.value===""?null:Number(e.target.value); afterPriceChange(); });
+
+  document.querySelectorAll("[data-acc]").forEach(el=>el.addEventListener("click", ()=>{
+    ui.acc[el.dataset.acc] = !ui.acc[el.dataset.acc];
+    renderDock();
+  }));
 
   document.querySelectorAll("[data-wsearch]").forEach(inp=>inp.addEventListener("input", (e)=>{
     const tab = inp.dataset.wsearch;
