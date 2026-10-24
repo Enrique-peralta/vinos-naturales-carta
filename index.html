@@ -285,7 +285,11 @@ body.detail-open{overflow:hidden;}
   background:linear-gradient(to right,rgba(255,255,255,0),var(--bg));
 }
 .vintages-fade.gone{opacity:0;}
-.row.sel .row-head{background:var(--bg-subtle);border-radius:var(--radius-md);}
+/* selected row: one soft pill that also wraps the colour dot and the + button;
+   the dividers touching it are hidden so no line floats next to the rounded ends */
+.row.sel{isolation:isolate;}
+.row.sel::before{content:"";position:absolute;inset:0 -8px 0 -12px;background:var(--bg-subtle);border-radius:var(--radius-md);z-index:-1;}
+.row.sel:not(:last-child)::after,.row:has(+ .row.sel)::after{display:none;}
 
 /* TABLET + DESKTOP: side panel with every filter visible */
 .wide-title,.panel{display:none;}
