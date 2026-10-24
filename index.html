@@ -70,8 +70,8 @@ main{padding:max(16px,env(safe-area-inset-top)) 16px calc(var(--dock-h) + 16px);
 .row-head{display:flex;align-items:center;gap:12px;padding:12px 0 12px 16px;cursor:pointer;}
 .row-main{flex:1 1 0;min-width:0;}
 .row-title{display:flex;gap:4px;align-items:baseline;white-space:nowrap;overflow:hidden;}
-.row-name{font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;}
-.row-vintage{color:var(--text-muted);flex:0 0 auto;}
+.row-name{font-weight:500;color:var(--text);flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;}
+.row-producer{font-size:var(--fs-xs);line-height:var(--lh-md);color:var(--text-muted);min-width:0;overflow:hidden;text-overflow:ellipsis;}
 .row-meta{font-size:var(--fs-sm);line-height:var(--lh-sm);color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .row-extra{font-size:var(--fs-sm);line-height:var(--lh-sm);color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .row-extra.profile{font-size:var(--fs-xs);line-height:var(--lh-xs);color:var(--text-subtle);}
@@ -601,25 +601,24 @@ function fichaBodyHtml(w){
     <div class="expand-row"><div class="expand-label">Notas del sumiller</div>${esc(w.notas || (w.notasSinDatos ? "Esta ficha aún no tiene notas de cata registradas." : "—"))}</div>
     <div class="expand-row"><div class="expand-label">Coste / Precio</div>Coste ${w.coste!=null?fmtPrice(w.coste)+" €":"—"} · PVP ${fmtPrice(w.precio)} €</div>`;
 }
-function vintageLabel(w){
-  const size = (w.tamano||"").trim();
-  const bigBottle = size && !/^75\s*cl$/i.test(size);
-  return [w.anio, bigBottle?size:""].filter(Boolean).join(" · ");
+// Row arrangement from Figma: name + producer on line 1, grapes · zone on line 2.
+function rowMetaText(w){
+  const grapes = w.uvasTags.length ? w.uvasTags.join(", ") : "";
+  const place = w.regionNorm || w.pais || "";
+  return [grapes, place].filter(Boolean).join(" · ") || "—";
 }
 function rowHtml(w){
   const inList = state.shortlist.has(w.id);
   const selected = state.detailId===w.id;
   const stock = lowStockLabel(w);
-  const grapeLine = state.grapes.size && w.uvasTags.length ? `<div class="row-extra">${esc(w.uvasTags.join(", "))}</div>` : "";
   const profileLine = state.taste.size && w.etiquetasCata.length ? `<div class="row-extra profile">${esc(w.etiquetasCata.join(" · "))}</div>` : "";
-  const place = w.regionNorm || w.pais;
   return `
   <div class="row ${selected?"sel":""}" data-id="${w.id}">
     <div class="row-head" data-toggle="${w.id}">
       <div class="row-main">
-        <div class="row-title"><span class="row-name">${esc(w.nombre)}</span><span class="row-vintage">${esc(vintageLabel(w))}</span></div>
-        <div class="row-meta">${esc(w.productora||"Productor sin especificar")}${place?` · ${esc(place)}`:""}</div>
-        ${grapeLine}${profileLine}
+        <div class="row-title"><span class="row-name">${esc(w.nombre)}</span><span class="row-producer">${esc(w.productora||"Productor sin especificar")}</span></div>
+        <div class="row-meta">${esc(rowMetaText(w))}</div>
+        ${profileLine}
       </div>
       <span class="row-dot" title="${esc(w.categoria)}">${dotImg(w.categoria,8)}</span>
       <div class="row-trail">
@@ -1049,8 +1048,8 @@ function renderShortlistDrawer(){
     <div class="row slrow ${open?"open":""}" data-slid="${w.id}">
       <div class="row-head" data-sltoggle="${w.id}">
         <div class="row-main">
-          <div class="row-title"><span class="row-name">${esc(w.nombre)}</span><span class="row-vintage">${esc(vintageLabel(w))}</span></div>
-          <div class="row-meta">${esc(w.productora||"Productor sin especificar")}</div>
+          <div class="row-title"><span class="row-name">${esc(w.nombre)}</span><span class="row-producer">${esc(w.productora||"Productor sin especificar")}</span></div>
+          <div class="row-meta">${esc(rowMetaText(w))}</div>
           <div class="tagline">${tasteTagsHtml(w)}</div>
         </div>
         <span class="row-dot" title="${esc(w.categoria)}">${dotImg(w.categoria,8)}</span>
