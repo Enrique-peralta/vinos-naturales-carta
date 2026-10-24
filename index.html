@@ -135,7 +135,10 @@ main{padding:max(16px,env(safe-area-inset-top)) 16px calc(var(--dock-h) + 16px);
 .head-label.muted{font-weight:400;color:var(--text-subtle);}
 .head-btn{background:none;border:0;padding:0;width:24px;height:24px;display:flex;align-items:center;justify-content:center;color:var(--text-subtle);}
 .head-btn .ic{width:20px;height:20px;}
-.head-search{flex:1 1 0;min-width:0;border:0;background:transparent;outline:0;font-weight:500;color:var(--text);padding:0;}
+button[hidden]{display:none !important;}
+.head-ic{color:var(--text-subtle);}
+.head-search{flex:1 1 0;min-width:0;border:0;background:transparent;outline:0;font-weight:500;color:var(--text);padding:0;-webkit-appearance:none;appearance:none;}
+.head-search::-webkit-search-cancel-button{display:none;}
 .head-search::placeholder{color:var(--text-subtle);font-weight:400;}
 .count-chip{background:rgba(255,255,255,.2);border-radius:var(--radius-sm);padding:0 8px;font-weight:500;}
 
@@ -292,7 +295,7 @@ body.detail-open{overflow:hidden;}
 .row.sel:not(:last-child)::after,.row:has(+ .row.sel)::after{display:none;}
 
 /* TABLET + DESKTOP: side panel with every filter visible */
-.wide-title,.panel{display:none;}
+.wide-title,.panel,.wide-search{display:none;}
 @media (min-width:768px){
   .app{max-width:none;display:grid;grid-template-columns:minmax(300px,360px) 1fr;align-items:start;}
   .panel:not([hidden]){
@@ -323,6 +326,15 @@ body.detail-open{overflow:hidden;}
   main{padding:32px 32px 112px;}
   .wide-title{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin:0 0 16px;padding:0 16px;}
   .wide-title h1{margin:0;font-size:22px;line-height:28px;font-weight:500;}
+  .wide-search{
+    display:flex;align-items:center;gap:12px;margin:0 16px 8px;padding:8px 16px;
+    background:var(--bg-subtle);border-radius:var(--radius-md);color:var(--text-subtle);
+  }
+  .wide-search input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:var(--text);padding:0;-webkit-appearance:none;appearance:none;}
+  .wide-search input::placeholder{color:var(--text-subtle);}
+  .wide-search input::-webkit-search-cancel-button{display:none;}
+  .wide-search:focus-within{box-shadow:0 0 0 1.5px var(--bg-accent);}
+  .wide-search button{background:none;border:0;padding:0;color:var(--text-subtle);display:flex;}
   .wide-title span{color:var(--text-subtle);font-size:var(--fs-sm);}
   .card-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));column-gap:24px;align-content:start;}
   .row-head{padding-right:0;}
@@ -353,7 +365,7 @@ body.detail-open{overflow:hidden;}
 <body>
 <div class="app">
   <aside class="panel" id="panel" hidden></aside>
-  <main><div class="wide-title"><h1>Carta de vinos naturales</h1><span id="resultCount"></span></div><div id="listWrap"></div></main>
+  <main><div class="wide-title"><h1>Carta de vinos naturales</h1><span id="resultCount"></span></div><label class="wide-search"><span class="ic ic-20 i-search"></span><input id="nameSearch" type="search" placeholder="Buscar por nombre o productor" autocomplete="off" autocorrect="off" spellcheck="false"><button id="nameSearchClear" type="button" hidden aria-label="Borrar búsqueda"><span class="ic ic-20 i-x"></span></button></label><div id="listWrap"></div></main>
   <aside class="detail" id="detail" hidden></aside>
   <div class="dock" id="dock"></div>
 </div>
@@ -380,9 +392,10 @@ let WINES = [];
 
 // UI copy, as written in the Figma file. Change here to localise.
 const T = {
-  tabs: {grape:"Tipo", region:"Región", profile:"Notas", price:"Precio"},
-  headers: {grape:"Tipo de uva", region:"Región", profile:"Notas", price:"Precio"},
+  tabs: {search:"Buscar", grape:"Tipo", region:"Región", profile:"Notas", price:"Precio"},
+  headers: {search:"Buscar", grape:"Tipo de uva", region:"Región", profile:"Notas", price:"Precio"},
   filterBy: "Filtrar por",
+  searchPlaceholder: "Buscar por nombre o productor",
   showAll: "Ver todo",
   showLess: "Ver menos",
   min: "Min",
@@ -396,8 +409,8 @@ const T = {
   noMatches: "Sin coincidencias",
 };
 
-const TABS = ["grape","region","profile","price"];
-const TAB_ICON = {grape:"i-grape", region:"i-pin", profile:"i-scale", price:"i-dollar"};
+const TABS = ["search","grape","region","profile","price"];
+const TAB_ICON = {search:"i-search", grape:"i-grape", region:"i-pin", profile:"i-scale", price:"i-dollar"};
 const SEARCHABLE = {grape:true, region:true};
 const COMMON_COUNT = 17;
 
@@ -474,7 +487,12 @@ function tokenFuzzyMatch(token, word){
   if(token.length>=4 && word.length>=4 && word.indexOf(token)===-1 && token.indexOf(word)!==-1) return true;
   if(token.length<=2) return false;
   const maxDist = token.length<=4?1:(token.length<=8?2:3);
-  return levenshtein(token,word)<=maxDist;
+  if(levenshtein(token,word)<=maxDist) return true;
+  // typing as you go: compare against the word's start too, so "fizi" still finds "fizzy"
+  if(token.length>=4 && word.length>token.length){
+    return levenshtein(token, word.slice(0,token.length)) <= (token.length<=6?1:2);
+  }
+  return false;
 }
 function wineHaystackWords(w){
   if(!w._words){
@@ -578,9 +596,11 @@ function activeFilterCount(){
   let n = state.taste.size + state.regions.size + state.grapes.size;
   if(state.priceMin!=null || state.priceMax!=null) n += 1;
   if(state.category!=="Todos") n += 1;
+  if(state.query.trim()) n += 1;
   return n;
 }
 function tabActive(tab){
+  if(tab==="search") return !!state.query.trim();
   if(tab==="grape") return state.grapes.size>0;
   if(tab==="region") return state.regions.size>0;
   if(tab==="profile") return state.taste.size>0;
@@ -715,6 +735,9 @@ function segmentedHtml(){
   }).join("") + `</div>`;
 }
 function headHtml(){
+  if(ui.tab==="search"){
+    return `<div class="sheet-head"><div class="head-row"><span class="ic ic-20 i-search head-ic"></span><input class="head-search" id="nameSearchM" type="search" placeholder="${T.searchPlaceholder}" value="${esc(state.query)}" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search"><button class="head-btn" id="nameClearM" ${state.query?"":"hidden"} aria-label="Borrar búsqueda"><span class="ic ic-20 i-x"></span></button></div></div>`;
+  }
   const label = T.headers[ui.tab];
   const searchable = SEARCHABLE[ui.tab];
   const searchBtn = searchable ? `<button class="head-btn" id="toggleSearch" aria-label="Buscar"><span class="ic ic-20 i-search"></span></button>` : "";
@@ -811,7 +834,7 @@ function renderDock(){
     html += `<div class="sheet${expandedCls}">
       <button class="grabber" id="grabber" aria-label="Cerrar filtros"></button>
       ${headHtml()}
-      <div class="sheet-content" id="sheetContent">${contentHtml()}</div>
+      ${ui.tab==="search"?"":`<div class="sheet-content" id="sheetContent">${contentHtml()}</div>`}
       ${expandedCls?`<div class="fade-bottom"></div><button class="show-less" id="showLess">${T.showLess}</button>`:""}
       ${tabsHtml()}
     </div>`;
@@ -891,6 +914,16 @@ function bindDock(){
   });
   on("showLess", ()=>{ ui.expanded=false; renderDock(); });
 
+  const nm = $("nameSearchM");
+  if(nm){
+    const clear = $("nameClearM");
+    nm.addEventListener("input", ()=>{
+      state.query = nm.value; clear.hidden = !nm.value;
+      renderLimit = 60; renderList(); syncTabDots();
+    });
+    clear.addEventListener("click", ()=>{ nm.value=""; state.query=""; clear.hidden=true; renderLimit=60; renderList(); syncTabDots(); nm.focus(); });
+  }
+
   const pMin = $("priceMin"), pMax = $("priceMax");
   if(pMin) pMin.addEventListener("input", (e)=>{ state.priceMin = e.target.value===""?null:Number(e.target.value); afterPriceChange(); });
   if(pMax) pMax.addEventListener("input", (e)=>{ state.priceMax = e.target.value===""?null:Number(e.target.value); afterPriceChange(); });
@@ -909,11 +942,14 @@ function bindDock(){
 
   bindChips();
 }
+// refresh only the tab indicators so an input being typed in keeps its focus
+function syncTabDots(){
+  document.querySelectorAll("#dock [data-tab]").forEach(el=>el.classList.toggle("active", tabActive(el.dataset.tab)));
+}
 function afterPriceChange(){
   renderLimit = 60;
   renderList();
-  // refresh only the tab indicators so the inputs keep focus
-  document.querySelectorAll("#dock [data-tab]").forEach(el=>el.classList.toggle("active", tabActive(el.dataset.tab)));
+  syncTabDots();
 }
 function bindChips(){
   const root = document.getElementById("sheetContent") || (isWide() ? document.getElementById("panel") : null);
@@ -941,6 +977,7 @@ function openSheet(tab){
   if(tab!==ui.tab){ ui.searching=false; ui.searchText=""; ui.expanded=false; }
   ui.tab = tab; ui.open = true;
   renderDock();
+  if(tab==="search"){ const el = document.getElementById("nameSearchM"); if(el){ el.focus(); el.setSelectionRange(el.value.length, el.value.length); } }
 }
 function closeSheet(){
   ui.open = false; ui.expanded = false; ui.searching = false; ui.searchText = "";
@@ -949,6 +986,9 @@ function closeSheet(){
 function clearAllFilters(){
   state.taste.clear(); state.regions.clear(); state.grapes.clear();
   state.priceMin = null; state.priceMax = null; state.category = "Todos";
+  state.query = "";
+  const ns = document.getElementById("nameSearch"); if(ns) ns.value = "";
+  const nc = document.getElementById("nameSearchClear"); if(nc) nc.hidden = true;
   renderLimit = 60;
   renderDock(); renderList();
 }
@@ -1115,6 +1155,14 @@ function init(){
   });
   if(window.ResizeObserver) new ResizeObserver(syncDockHeight).observe(document.getElementById("dock"));
   wideMq.addEventListener("change", ()=>{ closeSheet(); });
+  const ns = document.getElementById("nameSearch"), nc = document.getElementById("nameSearchClear");
+  ns.addEventListener("input", ()=>{
+    state.query = ns.value; nc.hidden = !ns.value;
+    renderLimit = 60; renderList(); renderDock();
+  });
+  nc.addEventListener("click", ()=>{ ns.value=""; state.query=""; nc.hidden=true; renderLimit=60; renderList(); renderDock(); ns.focus(); });
+  // both layouts share one query: keep the desktop field in step when the layout switches
+  wideMq.addEventListener("change", ()=>{ ns.value = state.query; nc.hidden = !state.query; });
 }
 
 // ---------- boot (loads data from the live sheet via /api/wines) ----------
