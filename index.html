@@ -584,9 +584,10 @@ function getFiltered(){
     if(state.hideUnavailable && !isSellable(w)) return false;
     if(state.category!=="Todos" && w.categoria!==state.category) return false;
     if(!matchesQuery(w, state.query)) return false;
-    if(state.taste.size && !w.etiquetasCata.some(t=>state.taste.has(t))) return false;
+    // tags combine with AND: the wine must carry every selected tasting note / grape
+    if(state.taste.size && ![...state.taste].every(t=>w.etiquetasCata.includes(t))) return false;
     if(state.regions.size && !state.regions.has(w.regionNorm)) return false;
-    if(state.grapes.size && !w.uvasTags.some(g=>state.grapes.has(g))) return false;
+    if(state.grapes.size && ![...state.grapes].every(g=>w.uvasTags.includes(g))) return false;
     if(state.priceMin!=null && (w.precio==null || w.precio<state.priceMin)) return false;
     if(state.priceMax!=null && (w.precio==null || w.precio>state.priceMax)) return false;
     return true;
