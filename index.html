@@ -173,6 +173,7 @@ button[hidden]{display:none !important;}
   padding:8px 16px;white-space:nowrap;max-width:100%;
 }
 .chip.on{background:var(--bg-accent);color:var(--on-accent);}
+.chip.dim,.chip:disabled{opacity:.35;cursor:not-allowed;}
 .chip.wide{flex:1 1 0;text-align:center;}
 .chip.more{background:var(--bg-subtle);border:1px solid var(--border);color:var(--text);font-weight:500;}
 .chips-body-row{display:flex;gap:8px;margin-bottom:12px;}
@@ -357,7 +358,7 @@ body.detail-open{overflow:hidden;}
   .card-list{grid-template-columns:repeat(auto-fill,minmax(440px,1fr));}
 }
 @media (hover:hover){
-  .chip:not(.on):hover{background:#fbfbfa;}
+  .chip:not(.on):not(:disabled):hover{background:#fbfbfa;}
   .add-btn:not(.added):hover{background:var(--bg-subtle);}
 }
 </style>
@@ -579,19 +580,28 @@ function pruneGrapesToCategory(){
 }
 
 // ---------- filtering ----------
-function getFiltered(){
+function getFiltered(opts){
+  const ignoreRegions = !!(opts && opts.ignoreRegions);
   return WINES.filter(w=>{
     if(state.hideUnavailable && !isSellable(w)) return false;
     if(state.category!=="Todos" && w.categoria!==state.category) return false;
     if(!matchesQuery(w, state.query)) return false;
     // tags combine with AND: the wine must carry every selected tasting note / grape
     if(state.taste.size && ![...state.taste].every(t=>w.etiquetasCata.includes(t))) return false;
-    if(state.regions.size && !state.regions.has(w.regionNorm)) return false;
+    if(!ignoreRegions && state.regions.size && !state.regions.has(w.regionNorm)) return false;
     if(state.grapes.size && ![...state.grapes].every(g=>w.uvasTags.includes(g))) return false;
     if(state.priceMin!=null && (w.precio==null || w.precio<state.priceMin)) return false;
     if(state.priceMax!=null && (w.precio==null || w.precio>state.priceMax)) return false;
     return true;
   });
+}
+// Which chips can still add something: a chip is available if at least one wine
+// matching the current filters has it (regions are OR, so they ignore the region filter).
+function availability(){
+  const grapes = new Set(), taste = new Set(), regions = new Set();
+  for(const w of getFiltered()){ w.uvasTags.forEach(g=>grapes.add(g)); w.etiquetasCata.forEach(t=>taste.add(t)); }
+  for(const w of getFiltered({ignoreRegions:true})) if(w.regionNorm) regions.add(w.regionNorm);
+  return {grapes, taste, regions};
 }
 function activeFilterCount(){
   let n = state.taste.size + state.regions.size + state.grapes.size;
@@ -692,16 +702,18 @@ function renderList(){
 }
 
 // ---------- render: dock ----------
-function chipHtml(label, on, attrs, extraCls){
-  return `<button class="chip ${on?"on":""} ${extraCls||""}" ${attrs}>${esc(label)}</button>`;
+function chipHtml(label, on, attrs, extraCls, disabled){
+  return `<button class="chip ${on?"on":""} ${extraCls||""} ${disabled?"dim":""}" ${attrs} ${disabled?"disabled":""}>${esc(label)}</button>`;
 }
 function chipsForTab(tab, opts){
   const expanded = opts ? opts.expanded : ui.expanded;
   const query = opts ? opts.query : ui.searchText;
   const inlineLess = !!(opts && opts.inlineLess);
   if(tab==="profile"){
-    const body = BODY_TAGS.map(t=>chipHtml(t, state.taste.has(t), `data-tag="${esc(t)}"`, "wide")).join("");
-    const rest = OTHER_TAGS.map(t=>chipHtml(t, state.taste.has(t), `data-tag="${esc(t)}"`)).join("");
+    const av = availability().taste;
+    const off = t => !state.taste.has(t) && !av.has(t);
+    const body = BODY_TAGS.map(t=>chipHtml(t, state.taste.has(t), `data-tag="${esc(t)}"`, "wide", off(t))).join("");
+    const rest = OTHER_TAGS.map(t=>chipHtml(t, state.taste.has(t), `data-tag="${esc(t)}"`, "", off(t))).join("");
     return `<div class="chips-body-row">${body}</div><div class="chips">${rest}</div>`;
   }
   const isGrape = tab==="grape";
@@ -715,7 +727,8 @@ function chipsForTab(tab, opts){
   if(q) list = all.filter(v=>normalize(v).includes(q));
   else list = expanded ? all : common;
   if(!list.length) return `<div class="none-found">${T.noMatches}</div>`;
-  let html = list.map(v=>chipHtml(v, sel.has(v), `${attr}="${esc(v)}"`)).join("");
+  const avail = availability()[isGrape?"grapes":"regions"];
+  let html = list.map(v=>chipHtml(v, sel.has(v), `${attr}="${esc(v)}"`, "", !sel.has(v) && !avail.has(v))).join("");
   if(!q && !expanded) html += `<button class="chip more" data-expand="${tab}">${T.showAll}</button>`;
   if(!q && expanded && inlineLess) html += `<button class="chip more" data-collapse="${tab}">${T.showLess}</button>`;
   return `<div class="chips">${html}</div>`;
@@ -810,7 +823,7 @@ function renderPanel(){
     ${panelSection("type", T.typeTitle, segmentedHtml())}
     ${panelSection("grape", T.headers.grape, wideSearchHtml("grape")+chipsBlock("grape"))}
     ${panelSection("region", T.headers.region, wideSearchHtml("region")+chipsBlock("region"))}
-    ${panelSection("profile", T.headers.profile, chipsForTab("profile"))}
+    ${panelSection("profile", T.headers.profile, `<div data-chips="profile">${chipsForTab("profile")}</div>`)}
     ${panelSection("price", T.headers.price, priceBody())}`;
   panel.scrollTop = top;
 }
@@ -937,8 +950,9 @@ function bindDock(){
   document.querySelectorAll("[data-wsearch]").forEach(inp=>inp.addEventListener("input", (e)=>{
     const tab = inp.dataset.wsearch;
     ui.wq[tab] = e.target.value;
-    document.querySelector(`[data-chips="${tab}"]`).innerHTML = chipsForTab(tab,{expanded:ui.exp[tab], query:ui.wq[tab], inlineLess:true});
-    bindChips();
+    const box = document.querySelector(`[data-chips="${tab}"]`);
+    box.innerHTML = chipsForTab(tab,{expanded:ui.exp[tab], query:ui.wq[tab], inlineLess:true});
+    bindChips(box);
   }));
 
   bindChips();
@@ -947,13 +961,22 @@ function bindDock(){
 function syncTabDots(){
   document.querySelectorAll("#dock [data-tab]").forEach(el=>el.classList.toggle("active", tabActive(el.dataset.tab)));
 }
+// Re-render only the chip groups (keeps focus in the field being typed in).
+function refreshChips(){
+  document.querySelectorAll("#panel [data-chips]").forEach(box=>{
+    const tab = box.dataset.chips;
+    box.innerHTML = tab==="profile" ? chipsForTab("profile") : chipsForTab(tab,{expanded:ui.exp[tab], query:ui.wq[tab], inlineLess:true});
+    bindChips(box);
+  });
+}
 function afterPriceChange(){
   renderLimit = 60;
   renderList();
   syncTabDots();
+  if(isWide()) refreshChips();
 }
-function bindChips(){
-  const root = document.getElementById("sheetContent") || (isWide() ? document.getElementById("panel") : null);
+function bindChips(container){
+  const root = container || document.getElementById("sheetContent") || (isWide() ? document.getElementById("panel") : null);
   if(!root) return;
   const toggle = (set, v) => { set.has(v) ? set.delete(v) : set.add(v); };
   root.querySelectorAll("[data-grape]").forEach(el=>el.addEventListener("click", ()=>{ toggle(state.grapes, el.dataset.grape); chipChanged(); }));
