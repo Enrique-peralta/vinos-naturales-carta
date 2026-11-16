@@ -2,7 +2,9 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#ffffff">
 <title>Carta de vinos naturales</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,6 +32,7 @@
   --fs-xs:12px; --lh-xs:16px;
   --dock-h:120px;
   font-size:16px;
+  color-scheme:light;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;}
@@ -71,7 +74,7 @@ main{padding:max(16px,env(safe-area-inset-top)) 16px calc(var(--dock-h) + 16px);
 .row-main{flex:1 1 0;min-width:0;}
 .row-title{display:flex;gap:4px;align-items:baseline;white-space:nowrap;overflow:hidden;}
 .row-name{font-weight:500;color:var(--text);flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;}
-.row-producer{font-size:var(--fs-xs);line-height:var(--lh-md);color:var(--text-muted);min-width:0;overflow:hidden;text-overflow:ellipsis;}
+.row-producer{font-size:var(--fs-xs);line-height:var(--lh-md);color:var(--text-muted);flex:1 1 0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .row-meta{font-size:var(--fs-sm);line-height:var(--lh-sm);color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .row-extra{font-size:var(--fs-sm);line-height:var(--lh-sm);color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .row-extra.profile{font-size:var(--fs-xs);line-height:var(--lh-xs);color:var(--text-subtle);}
@@ -137,6 +140,15 @@ main{padding:max(16px,env(safe-area-inset-top)) 16px calc(var(--dock-h) + 16px);
 .head-btn .ic{width:20px;height:20px;}
 button[hidden]{display:none !important;}
 .head-ic{color:var(--text-subtle);}
+.sheet.search-sheet{padding:12px 12px calc(12px + env(safe-area-inset-bottom));}
+.search-row{display:flex;align-items:center;gap:8px;}
+.search-pill{flex:1;min-width:0;height:48px;display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-full);padding:0 6px 0 16px;}
+.search-pill:focus-within{border-color:var(--bg-accent);}
+.search-pill input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:var(--text);font-size:16px;padding:0;-webkit-appearance:none;appearance:none;}
+.search-pill input::placeholder{color:var(--text-subtle);}
+.search-pill input::-webkit-search-cancel-button{display:none;}
+.search-clear{width:36px;height:36px;border:0;background:none;padding:0;color:var(--text-subtle);display:flex;align-items:center;justify-content:center;}
+.search-done{flex:0 0 auto;width:48px;height:48px;border-radius:var(--radius-full);background:var(--bg);border:1px solid var(--border);color:var(--text);padding:0;display:flex;align-items:center;justify-content:center;}
 .head-search{flex:1 1 0;min-width:0;border:0;background:transparent;outline:0;font-weight:500;color:var(--text);padding:0;-webkit-appearance:none;appearance:none;}
 .head-search::-webkit-search-cancel-button{display:none;}
 .head-search::placeholder{color:var(--text-subtle);font-weight:400;}
@@ -492,7 +504,7 @@ function tokenFuzzyMatch(token, word){
   const maxDist = token.length<=4?1:(token.length<=8?2:3);
   if(levenshtein(token,word)<=maxDist) return true;
   // typing as you go: compare against the word's start too, so "fizi" still finds "fizzy"
-  if(token.length>=4 && word.length>token.length){
+  if(token.length>=4 && word.length>token.length && token[0]===word[0]){
     return levenshtein(token, word.slice(0,token.length)) <= (token.length<=6?1:2);
   }
   return false;
@@ -501,9 +513,21 @@ function wineHaystackWords(w){
   if(!w._words){
     const hay = normalize(w.nombre+" "+w.productora);
     w._words = hay.split(/[^a-z0-9à-ú]+/i).filter(Boolean);
+    w._nameWords = normalize(w.nombre).split(/[^a-z0-9à-ú]+/i).filter(Boolean);
     w._hay = hay;
   }
   return w;
+}
+// Lower is better: a token that starts a word of the wine's name beats one found
+// elsewhere (producer, middle of a word, typo-tolerant match).
+function matchRank(w, query){
+  wineHaystackWords(w);
+  return normalize(query).split(/\s+/).filter(Boolean).reduce((sum, qt)=>{
+    if(w._nameWords.some(x=>x.startsWith(qt))) return sum;
+    if(w._words.some(x=>x.startsWith(qt))) return sum+1;
+    if(w._hay.includes(qt)) return sum+2;
+    return sum+3;
+  }, 0);
 }
 function matchesQuery(w, query){
   if(!query) return true;
@@ -669,7 +693,11 @@ function rowHtml(w){
 
 let renderLimit = 60;
 function renderList(){
-  const filtered = getFiltered();
+  let filtered = getFiltered();
+  if(state.query.trim()){
+    const q = state.query;
+    filtered = filtered.map((w,i)=>({w,i,r:matchRank(w,q)})).sort((a,b)=>a.r-b.r||a.i-b.i).map(x=>x.w);
+  }
   const wrap = document.getElementById("listWrap");
   document.getElementById("resultCount").textContent = filtered.length + (filtered.length===1?" vino":" vinos");
   if(!filtered.length){
@@ -751,9 +779,6 @@ function segmentedHtml(){
   }).join("") + `</div>`;
 }
 function headHtml(){
-  if(ui.tab==="search"){
-    return `<div class="sheet-head"><div class="head-row"><span class="ic ic-20 i-search head-ic"></span><input class="head-search" id="nameSearchM" type="search" placeholder="${T.searchPlaceholder}" value="${esc(state.query)}" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search"><button class="head-btn" id="nameClearM" ${state.query?"":"hidden"} aria-label="Borrar búsqueda"><span class="ic ic-20 i-x"></span></button></div></div>`;
-  }
   const label = T.headers[ui.tab];
   const searchable = SEARCHABLE[ui.tab];
   const searchBtn = searchable ? `<button class="head-btn" id="toggleSearch" aria-label="Buscar"><span class="ic ic-20 i-search"></span></button>` : "";
@@ -845,12 +870,24 @@ function renderDock(){
     syncDockHeight();
     return;
   }
-  if(ui.open){
+  if(ui.open && ui.tab==="search"){
+    // compact search: just the field and a way out, no filter tabs while typing
+    html += `<div class="sheet search-sheet">
+      <div class="search-row">
+        <label class="search-pill">
+          <span class="ic ic-20 i-search head-ic"></span>
+          <input id="nameSearchM" type="search" inputmode="search" enterkeyhint="search" placeholder="${T.searchPlaceholder}" value="${esc(state.query)}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+          <button class="search-clear" id="nameClearM" type="button" ${state.query?"":"hidden"} aria-label="Borrar búsqueda"><span class="ic ic-20 i-x"></span></button>
+        </label>
+        <button class="search-done" id="nameDoneM" type="button" aria-label="Cerrar búsqueda"><span class="ic ic-20 i-chev"></span></button>
+      </div>
+    </div>`;
+  } else if(ui.open){
     const expandedCls = ui.expanded && ui.tab!=="profile" && ui.tab!=="price" ? " expanded" : "";
     html += `<div class="sheet${expandedCls}">
       <button class="grabber" id="grabber" aria-label="Cerrar filtros"></button>
       ${headHtml()}
-      ${ui.tab==="search"?"":`<div class="sheet-content" id="sheetContent">${contentHtml()}</div>`}
+      <div class="sheet-content" id="sheetContent">${contentHtml()}</div>
       ${expandedCls?`<div class="fade-bottom"></div><button class="show-less" id="showLess">${T.showLess}</button>`:""}
       ${tabsHtml()}
     </div>`;
@@ -871,6 +908,19 @@ function renderDock(){
   syncDockHeight();
 }
 // The minimized dock has no .tabs row; keep the compact bar reading like the Figma "Minimized" frame.
+function scrollToTop(){
+  window.scrollTo(0,0);
+  if(document.scrollingElement) document.scrollingElement.scrollTop = 0;
+}
+// Browsers that keep the layout viewport behind the on-screen keyboard (iOS Safari, some
+// Android builds): lift the dock by the keyboard height so it never hides behind it.
+function syncKeyboard(){
+  const dock = document.getElementById("dock"), vv = window.visualViewport;
+  if(!dock) return;
+  if(isWide() || !vv){ dock.style.bottom = ""; return; }
+  const kb = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+  dock.style.bottom = kb ? kb+"px" : "";
+}
 function syncDockHeight(){
   const dock = document.getElementById("dock");
   const h = dock.offsetHeight;
@@ -935,9 +985,12 @@ function bindDock(){
     const clear = $("nameClearM");
     nm.addEventListener("input", ()=>{
       state.query = nm.value; clear.hidden = !nm.value;
-      renderLimit = 60; renderList(); syncTabDots();
+      renderLimit = 60; renderList();
+      scrollToTop();   // new results: always start reading from the first one
     });
-    clear.addEventListener("click", ()=>{ nm.value=""; state.query=""; clear.hidden=true; renderLimit=60; renderList(); syncTabDots(); nm.focus(); });
+    nm.addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); nm.blur(); } });   // search key: hide the keyboard, keep the results
+    clear.addEventListener("click", ()=>{ nm.value=""; state.query=""; clear.hidden=true; renderLimit=60; renderList(); scrollToTop(); nm.focus(); });
+    $("nameDoneM").addEventListener("click", ()=>{ nm.blur(); closeSheet(); });
   }
 
   const pMin = $("priceMin"), pMax = $("priceMax");
@@ -1098,7 +1151,75 @@ function toggleShortlist(id){
   else { state.shortlist.add(id); showToast("Añadido a la shortlist"); }
   updateAfterShortlist();
 }
+// The shortlist survives a refresh: it is kept in this browser (localStorage), keyed by
+// name + vintage + producer + size because the numeric ids change whenever the sheet does.
+const SHORTLIST_KEY = "vinya.shortlist.v2";
+const SHORTLIST_TTL = 12*60*60*1000;     // a shortlist is for one service: it expires 12 h after its last change
+const SHEET_REFRESH = 5*60*1000;         // re-read the sheet when the app comes back after this long
+const wineKey = w => [w.nombre, w.anio, w.productora, w.tamano].map(normalize).join("|");
+let lastSync = Date.now();
+function readStoredShortlist(){
+  try{
+    const raw = JSON.parse(localStorage.getItem(SHORTLIST_KEY) || "null");
+    if(raw && Array.isArray(raw.keys)) return raw;
+  }catch(e){}
+  return null;
+}
+function shortlistExpired(){
+  const st = readStoredShortlist();
+  return !!st && Date.now() - st.savedAt > SHORTLIST_TTL;
+}
+function saveShortlist(){
+  try{
+    const keys = WINES.filter(w=>state.shortlist.has(w.id)).map(wineKey);
+    if(keys.length) localStorage.setItem(SHORTLIST_KEY, JSON.stringify({savedAt:Date.now(), keys}));
+    else localStorage.removeItem(SHORTLIST_KEY);
+  }catch(e){ /* private mode / storage blocked: the list simply won't persist */ }
+}
+function loadShortlist(){
+  try{
+    localStorage.removeItem("vinya.shortlist.v1");
+    const st = readStoredShortlist();
+    if(!st) return;
+    if(shortlistExpired()){ localStorage.removeItem(SHORTLIST_KEY); return; }
+    const keys = new Set(st.keys);
+    WINES.forEach(w=>{ if(keys.has(wineKey(w))) state.shortlist.add(w.id); });
+  }catch(e){}
+}
+// Keep the app in step with the sheet: re-read it, then re-attach the shortlist, the open
+// detail page and the filters to the fresh rows (ids are row numbers, so they can shift).
+async function syncWithSheet(){
+  let data;
+  try{
+    const res = await fetch("/api/wines", {cache:"no-store"});
+    if(!res.ok) return;
+    data = await res.json();
+    if(!Array.isArray(data) || !data.length) return;
+  }catch(e){ return; }
+  const oldKeys = WINES.filter(w=>state.shortlist.has(w.id)).map(wineKey);
+  const detailWine = state.detailId!=null ? WINES.find(w=>w.id===state.detailId) : null;
+  WINES = data; lastSync = Date.now();
+  computeDerived();
+  const keys = new Set(oldKeys);
+  state.shortlist = new Set(WINES.filter(w=>keys.has(wineKey(w))).map(w=>w.id));
+  state.detailId = detailWine ? ((WINES.find(w=>wineKey(w)===wineKey(detailWine))||{}).id ?? null) : null;
+  state.openSlRow = null;
+  pruneGrapesToCategory();
+  saveShortlist();
+  renderDock(); renderList(); renderDetail();
+  if(document.getElementById("shortlistDrawer").classList.contains("open")) renderShortlistDrawer();
+  const lost = oldKeys.length - state.shortlist.size;
+  if(lost>0) showToast(lost===1 ? "1 vino ya no está en la carta" : `${lost} vinos ya no están en la carta`);
+}
+function checkFreshness(){
+  if(document.visibilityState!=="visible") return;
+  if(state.shortlist.size && shortlistExpired()){
+    state.shortlist.clear(); updateAfterShortlist(); showToast("Shortlist caducada");
+  }
+  if(Date.now() - lastSync > SHEET_REFRESH) syncWithSheet();
+}
 function updateAfterShortlist(){
+  saveShortlist();
   renderDock();
   renderList();
   if(state.detailId!=null) renderDetail();
@@ -1179,8 +1300,13 @@ function init(){
       showToast(items.length? "No se pudo copiar" : "La shortlist está vacía");
     }
   });
+  document.addEventListener("visibilitychange", checkFreshness);
+  window.addEventListener("pageshow", checkFreshness);
+  // a screen left on for hours: re-check now and then, but never while someone is typing
+  setInterval(()=>{ const a=document.activeElement; if(!(a && /INPUT|TEXTAREA/.test(a.tagName))) checkFreshness(); }, SHEET_REFRESH);
+  if(window.visualViewport){ visualViewport.addEventListener("resize", syncKeyboard); visualViewport.addEventListener("scroll", syncKeyboard); }
   if(window.ResizeObserver) new ResizeObserver(syncDockHeight).observe(document.getElementById("dock"));
-  wideMq.addEventListener("change", ()=>{ closeSheet(); });
+  wideMq.addEventListener("change", ()=>{ closeSheet(); syncKeyboard(); });
   const ns = document.getElementById("nameSearch"), nc = document.getElementById("nameSearchClear");
   ns.addEventListener("input", ()=>{
     state.query = ns.value; nc.hidden = !ns.value;
@@ -1215,6 +1341,8 @@ async function boot(){
     return;
   }
   computeDerived();
+  lastSync = Date.now();
+  loadShortlist();
   if(!window.__inited){ window.__inited = true; init(); } else { renderDock(); renderList(); }
 }
 boot();
