@@ -308,6 +308,10 @@ body.detail-open{overflow:hidden;}
 .row.sel:not(:last-child)::after,.row:has(+ .row.sel)::after{display:none;}
 
 /* TABLET + DESKTOP: side panel with every filter visible */
+/* demo banner: only shown when the API says it is serving the demo sample */
+.demo-banner{display:none;align-items:center;justify-content:center;gap:8px;padding:6px 16px;background:var(--bg-subtle);color:var(--text-muted);font-size:var(--fs-xs);line-height:var(--lh-xs);text-align:center;}
+.demo-banner[data-on]{display:flex;}
+.demo-banner b{background:var(--bg-accent);color:#fff;font-weight:600;letter-spacing:.06em;padding:1px 8px;border-radius:999px;}
 .wide-title,.panel,.wide-search{display:none;}
 @media (min-width:768px){
   .app{max-width:none;display:grid;grid-template-columns:minmax(300px,360px) 1fr;align-items:start;}
@@ -376,6 +380,7 @@ body.detail-open{overflow:hidden;}
 </style>
 </head>
 <body>
+<div class="demo-banner" id="demoBanner"><b>DEMO</b><span>Carta de muestra con 30 vinos</span></div>
 <div class="app">
   <aside class="panel" id="panel" hidden></aside>
   <main><div class="wide-title"><h1>Carta de vinos naturales</h1><span id="resultCount"></span></div><label class="wide-search"><span class="ic ic-20 i-search"></span><input id="nameSearch" type="search" placeholder="Buscar por nombre o productor" autocomplete="off" autocorrect="off" spellcheck="false"><button id="nameSearchClear" type="button" hidden aria-label="Borrar búsqueda"><span class="ic ic-20 i-x"></span></button></label><div id="listWrap"></div></main>
@@ -1327,6 +1332,10 @@ async function boot(){
   try{
     const res = await fetch("/api/wines", {cache:"no-store"});
     if(!res.ok) throw new Error("HTTP "+res.status);
+    if(res.headers.get("X-Wines-Source")==="demo"){
+      document.getElementById("demoBanner").setAttribute("data-on","");
+      document.title = "Demo · " + document.title.replace(/^Demo · /,"");
+    }
     const data = await res.json();
     if(!Array.isArray(data) || !data.length) throw new Error("respuesta vacía");
     WINES = data;

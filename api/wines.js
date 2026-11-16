@@ -1,7 +1,13 @@
 // Vercel serverless function: fetches the live Google Sheet, parses it server-side
 // (so the client never deals with CORS or raw CSV), and returns clean wine records.
 
-const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/15H9vKeD_YPwJf2-ATEKqiF5n2beeo1qAp6iJwdk5jpc/export?format=csv";
+// Which data this deployment serves (set as an environment variable in Vercel):
+//   WINES_SOURCE=demo  -> a small fixed sample from data/demo-wines.json; the sheet is never read
+//   (unset)            -> the live Google Sheet below
+// SHEET_CSV_URL can also be set as an environment variable to point a deployment at another
+// client's sheet (any "Anyone with the link: Viewer" sheet exported as CSV with the same columns).
+const DEFAULT_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/15H9vKeD_YPwJf2-ATEKqiF5n2beeo1qAp6iJwdk5jpc/export?format=csv";
+const SHEET_CSV_URL = process.env.SHEET_CSV_URL || DEFAULT_SHEET_CSV_URL;
 
 function parseCSV(text) {
   const rows = [];
@@ -60,6 +66,12 @@ function boolCell(s) {
 
 module.exports = async (req, res) => {
   try {
+    if (process.env.WINES_SOURCE === "demo") {
+      res.setHeader("X-Wines-Source", "demo");
+      res.setHeader("Cache-Control", "s-maxage=300, stale-while-revalidate=1800");
+      res.status(200).json(require("../data/demo-wines.json"));
+      return;
+    }
     const r = await fetch(SHEET_CSV_URL);
     if (!r.ok) throw new Error("No se pudo leer la hoja (HTTP " + r.status + ")");
     const text = await r.text();

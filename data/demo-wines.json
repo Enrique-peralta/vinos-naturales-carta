@@ -1,0 +1,898 @@
+[
+ {
+  "id": 1,
+  "nombre": "Alba y Barro",
+  "pais": "España",
+  "categoria": "Burbujas",
+  "anio": "2023",
+  "regionNorm": "Marco de Jerez",
+  "productora": "Raúl Moreno",
+  "uva": "Beba y Alarije de Tierra de Barros (Extremadura) de viñedos de 20 años y Palomino de Sanlúcar de Barrameda (Andalucía) de un viñedo centenario \n\nenvío y enfriamiento del Palomino hasta que se vendimie las otras, prensado conjunto a una extracción del 50%\n\n9 meses en rima.",
+  "uvasTags": [
+   "Palomino",
+   "Alarije",
+   "Beba"
+  ],
+  "uvasRevisar": false,
+  "notas": "Jugoso, Crujiente, Afrutado, cremoso, yougurt, Bueno con comida frita y grasa",
+  "etiquetasCata": [
+   "Fresco",
+   "Afrutado"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 5,
+   "label": "5"
+  }
+ },
+ {
+  "id": 2,
+  "nombre": "Alba y Barro",
+  "pais": "España",
+  "categoria": "Burbujas",
+  "anio": "2021",
+  "regionNorm": "Marco de Jerez",
+  "productora": "Raúl Moreno",
+  "uva": "Beba y Alarije de Tierra de Barros (Extremadura) de viñedos de 20 años y Palomino de Sanlúcar de Barrameda (Andalucía) de un viñedo centenario \n\nenvío y enfriamiento del Palomino hasta que se vendimie las otras, prensado conjunto a una extracción del 50%\n\n9 meses en rima.",
+  "uvasTags": [
+   "Palomino",
+   "Alarije",
+   "Beba"
+  ],
+  "uvasRevisar": false,
+  "notas": "Jugoso, Crujiente, Afrutado, cremoso, yougurt, Bueno con comida frita y grasa",
+  "etiquetasCata": [
+   "Fresco",
+   "Afrutado"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 8,
+   "label": "8"
+  }
+ },
+ {
+  "id": 3,
+  "nombre": "Sec",
+  "pais": "Francia",
+  "categoria": "Blanco",
+  "anio": "2024",
+  "regionNorm": "Jurançon (Pirineos Atlánticos)",
+  "productora": "CHÂTEAU LAFITTE",
+  "uva": "80 % Petit Manseng, 20 % Gros Manseng.\n\nFermentación espontánea en barricas de 500 litros. Crianza de 9 meses sobre lías finas, en las mismas barricas de roble..",
+  "uvasTags": [
+   "Petit Manseng",
+   "Gros Manseng"
+  ],
+  "uvasRevisar": false,
+  "notas": "Nariz ligeramente tostada, como pan recién hecho. Luego viene una nota de fruta confitada. Boca redonda y fresca",
+  "etiquetasCata": [
+   "Fresco",
+   "Afrutado",
+   "Ligero"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 6,
+   "label": "6"
+  }
+ },
+ {
+  "id": 4,
+  "nombre": "Sec",
+  "pais": "Francia",
+  "categoria": "Blanco",
+  "anio": "2023",
+  "regionNorm": "Jurançon (Pirineos Atlánticos)",
+  "productora": "CHÂTEAU LAFITTE",
+  "uva": "80 % Petit Manseng, 20 % Gros Manseng.\n\nFermentación espontánea en barricas de 500 litros. Crianza de 9 meses sobre lías finas, en las mismas barricas de roble..",
+  "uvasTags": [
+   "Petit Manseng",
+   "Gros Manseng"
+  ],
+  "uvasRevisar": false,
+  "notas": "Nariz ligeramente tostada, como pan recién hecho. Luego viene una nota de fruta confitada. Boca redonda y fresca",
+  "etiquetasCata": [
+   "Fresco",
+   "Afrutado",
+   "Ligero"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 6,
+   "label": "6"
+  }
+ },
+ {
+  "id": 5,
+  "nombre": "Sec",
+  "pais": "Francia",
+  "categoria": "Blanco",
+  "anio": "2022",
+  "regionNorm": "Jurançon (Pirineos Atlánticos)",
+  "productora": "CHÂTEAU LAFITTE",
+  "uva": "80 % Petit Manseng, 20 % Gros Manseng.\n\nFermentación espontánea en barricas de 500 litros. Crianza de 9 meses sobre lías finas, en las mismas barricas de roble..",
+  "uvasTags": [
+   "Petit Manseng",
+   "Gros Manseng"
+  ],
+  "uvasRevisar": false,
+  "notas": "Nariz ligeramente tostada, como pan recién hecho. Luego viene una nota de fruta confitada. Boca redonda y fresca",
+  "etiquetasCata": [
+   "Fresco",
+   "Afrutado",
+   "Ligero"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 6,
+   "label": "6"
+  }
+ },
+ {
+  "id": 6,
+  "nombre": "Cigogne BLUE",
+  "pais": "Francia",
+  "categoria": "Orange",
+  "anio": "2022",
+  "regionNorm": "Jura",
+  "productora": "L'octavin",
+  "uva": "60%  Gewürztraminer 40% Pinot Gris\n\nA blend of sixty percent Gewürztraminer and forty percent Pinot Gris from the biodynamic vineyards of the Humbrecht family in Alsace. The grapes were fermented as whole bunches for ten days before being pressed off to cuve to rest until spring.",
+  "uvasTags": [
+   "Gewürztraminer",
+   "Pinot Gris"
+  ],
+  "uvasRevisar": false,
+  "notas": "A hazy shade of amber, the heady notes of quince and spice are offset by fine tannins and a bitterness that complements any exuberance beautifully.",
+  "etiquetasCata": [
+   "Afrutado",
+   "Vibrante",
+   "Especiado"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 3,
+   "label": "3"
+  }
+ },
+ {
+  "id": 7,
+  "nombre": "Cigogne BLUE",
+  "pais": "Francia",
+  "categoria": "Orange",
+  "anio": "2021",
+  "regionNorm": "Jura",
+  "productora": "L'octavin",
+  "uva": "60%  Gewürztraminer 40% Pinot Gris\n\nA blend of sixty percent Gewürztraminer and forty percent Pinot Gris from the biodynamic vineyards of the Humbrecht family in Alsace. The grapes were fermented as whole bunches for ten days before being pressed off to cuve to rest until spring.",
+  "uvasTags": [
+   "Gewürztraminer",
+   "Pinot Gris"
+  ],
+  "uvasRevisar": false,
+  "notas": "A hazy shade of amber, the heady notes of quince and spice are offset by fine tannins and a bitterness that complements any exuberance beautifully.",
+  "etiquetasCata": [
+   "Afrutado",
+   "Vibrante",
+   "Especiado"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 7,
+   "label": "7"
+  }
+ },
+ {
+  "id": 8,
+  "nombre": "FIZZY  2023",
+  "pais": "Alemania",
+  "categoria": "Blanco",
+  "anio": "2023",
+  "regionNorm": "Nahe",
+  "productora": "GLOW GLOW, Pauline and Carl Baumberger",
+  "uva": "Scheurebe,  Bacchus ,  Riesling,  Muscat ,  Müller-Thurgau,  Chardonnay \n\nCarl & Pauline Baumberger who are 6th generation winemakers from the Nahe region in Germany",
+  "uvasTags": [
+   "Müller-Thurgau",
+   "Chardonnay",
+   "Scheurebe",
+   "Riesling",
+   "Bacchus",
+   "Moscatel"
+  ],
+  "uvasRevisar": false,
+  "notas": "herbal lemonade with hints of apricot and mandarin, burbujas fina porque degorgado",
+  "etiquetasCata": [
+   "Afrutado"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 1,
+   "label": "1"
+  }
+ },
+ {
+  "id": 9,
+  "nombre": "La Luna rosado",
+  "pais": "Francia",
+  "categoria": "Rosado",
+  "anio": "2024",
+  "regionNorm": "Rosellón (Banyuls)",
+  "productora": "Bruno Duchêne",
+  "uva": "Garnacha (40%), Monastrell (30%) y Syrah (30%) de Banyuls y Tempranillo (60%) y Cinsault (40%) de la Sierra de la Albera\n\n\nSuelo\n    pizarra en Banyuls, granítico en la Sierra de la Albera\nVinificación\n    vendimia manual, prensado suave de los racimos enteros, fermentación alcohólica en grandes fudres abiertos con levaduras autóctonas\nCrianza\n    6 meses en depósitos de acero inoxidable (2/3) y barricas de roble (1/3)",
+  "uvasTags": [
+   "Tempranillo",
+   "Monastrell",
+   "Garnacha",
+   "Cinsault",
+   "Syrah"
+  ],
+  "uvasRevisar": false,
+  "notas": "Fruita Mineral, Fresco, ligero",
+  "etiquetasCata": [
+   "Fresco",
+   "Mineral",
+   "Afrutado",
+   "Ligero"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 9,
+   "label": "9"
+  }
+ },
+ {
+  "id": 10,
+  "nombre": "A Bruxa 2023",
+  "pais": "España",
+  "categoria": "Tinto",
+  "anio": "2023",
+  "regionNorm": "Bierzo",
+  "productora": "Verónica Ortega",
+  "uva": "Mencía (70%), Alicante, Palomino y bastante Doña Blanca y Godello (30%) del mismo viñedo centenario.\n\n\n17 meses en dos barricas de roble francés de 300 l de capacidad y 1 ánfora de barro de 700 l\n\n\nEs una de las tardías del valle de Cobrana con un pH muy bajo y un perfil vibrante. Se trata de un vino con remarcada elegancia, jugosa viveza y enmarcada por una tensión extraordinaria.",
+  "uvasTags": [
+   "Doña Blanca",
+   "Palomino",
+   "Garnacha Tintorera",
+   "Godello",
+   "Mencía"
+  ],
+  "uvasRevisar": false,
+  "notas": "Vino de un preciso equilibrio, en la que la fruta roja juega con la mineralidad combinada de la pizarra y la arena,, profunda y cristalina a la vez, con trama esbelta y afilada reflejo de esa beta cálcarea., Uno de los últimos vinos más admirados por RP (98+) de la serie Cobrana.",
+  "etiquetasCata": [
+   "Mineral",
+   "Afrutado",
+   "Eléctrico",
+   "Vibrante"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 2,
+   "label": "2"
+  }
+ },
+ {
+  "id": 11,
+  "nombre": "Flor de maeve",
+  "pais": "España",
+  "categoria": "Blanco",
+  "anio": "2024",
+  "regionNorm": "Penedès",
+  "productora": "LUCY CHILVERS",
+  "uva": "Xarel-lo\n\n90-year-old Xarel·lo",
+  "uvasTags": [
+   "Xarel·lo"
+  ],
+  "uvasRevisar": false,
+  "notas": "bursts with wild grasses, dried apricot and lily. Rich, but tempered with a racy saline acidity through crunchy tannin.",
+  "etiquetasCata": [
+   "Fresco",
+   "Mineral",
+   "Acídico",
+   "Afrutado",
+   "Con cuerpo"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 8,
+   "label": "8"
+  }
+ },
+ {
+  "id": 12,
+  "nombre": "Ollos de Roque",
+  "pais": "España",
+  "categoria": "Blanco",
+  "anio": "2022",
+  "regionNorm": "Ribeira Sacra",
+  "productora": "Augalevada",
+  "uva": "Treixadura, Albariño, Godello, Lado, Loureira \n\nprensados directamente. Fermentación y crianza en barricas de 600 y 330 litros, bota de 500 y tinaja de 400.   \nLos suelos son de granito descompuesto y la viticultura biodinámica.  \n\n7 meses en ánforas con sus lías finas",
+  "uvasTags": [
+   "Treixadura",
+   "Albariño",
+   "Loureiro",
+   "Godello",
+   "Lado"
+  ],
+  "uvasRevisar": false,
+  "notas": "Muy fino, Fruita mineral y salina",
+  "etiquetasCata": [
+   "Mineral",
+   "Afrutado",
+   "Vibrante"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 6,
+   "label": "6"
+  }
+ },
+ {
+  "id": 13,
+  "nombre": "Tout Va Bien",
+  "pais": "Francia",
+  "categoria": "Blanco",
+  "anio": "2024",
+  "regionNorm": "Alsacia",
+  "productora": "JEUX DE VINS, Julien Albertus",
+  "uva": "Pinot Auxerrois\n\nVinificación: prensado directo y fermentación y crianza en inox durante 9-12 meses en foudre 100% Pinot Auxerrois. La Auxerrois (o Pinot Auxerrois) es una variedad desconocida que tiene más cuerpo y es menos fresco que sus primos alsacianos, el Pinot Blanc y el Riesling.\n\nJulien lo describe el vino como \"une pure merveille de\nbuvabilité\", es decir \"altamente chuggabble\".",
+  "uvasTags": [
+   "Auxerrois",
+   "Pinot Blanc",
+   "Riesling"
+  ],
+  "uvasRevisar": false,
+  "notas": "Sabores cítricos, con un perfil aromático rico y almizclado., Con tiempo, puede adquirir sabores melosos y un color más, intenso.",
+  "etiquetasCata": [
+   "Fresco",
+   "Acídico",
+   "Eléctrico"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 5,
+   "label": "5"
+  }
+ },
+ {
+  "id": 14,
+  "nombre": "Soki Soki 2025",
+  "pais": "Italia",
+  "categoria": "Orange",
+  "anio": "2023",
+  "regionNorm": "Sicilia (Pantelleria)",
+  "productora": "Tanca Nica",
+  "uva": "100% Zibibbo\n\nSuelo\n    arenas volcánicas de piedra pómez y lapilli\nVinificación\n    vendimia manual, vinificación separada de cada parcela, despalillado total de la uva, maceración variada de un día a tres semanas, fermentación espontánea con levaduras autóctonas en depósito de acero inoxidable o depósito de cerámica o barricas de castaño o depósito en en garrafa de cristal",
+  "uvasTags": [
+   "Moscatel de Alejandría"
+  ],
+  "uvasRevisar": false,
+  "notas": "Expect a fresh orange wine bursting with peach, apricot, passion fruit, and orange, lifted by hints of honey, thyme, menthol, and wild herbs. Juicy, round, and full of sunshine artisan winemaking straight from European island vineyards, En dialecto pantescano, «Soki Soki» es el nombre de los suelos más típicos de la isla: arenas volcánicas de piedra pómez y lapilli. El término es una onomatopeya del sonido que se hace al caminar sobre ellas. Soki Soki proviene de 11 parcelas situadas en terrazas sobre la isla de Pantelleria, cada una media 30 áreas y tiene su propria microclima, inclinación. Este sitio ha sido declarado Patrimonio de la Humanidad por la UNESCO",
+  "etiquetasCata": [
+   "Fresco",
+   "Afrutado",
+   "Tropical"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 2,
+   "label": "2"
+  }
+ },
+ {
+  "id": 15,
+  "nombre": "SONNE Nº9",
+  "pais": "Austria",
+  "categoria": "Orange",
+  "anio": "2020",
+  "regionNorm": "Estiria (Steiermark)",
+  "productora": "STROHMEIER",
+  "uva": "Souvingon Blanc\nBad gams and Stainz vineyards (gneiss soil, Iron and silca content)\n\nGentle Crushed, 4 weeks skin contact \n12 month aging in barrel (50% oak, 50% Acacia)",
+  "uvasTags": [
+   "Sauvignon Blanc"
+  ],
+  "uvasRevisar": false,
+  "notas": "Green tea, Jasmine, citrus skin, Hits you orizontally, Tannic structure and pleasent acidity",
+  "etiquetasCata": [
+   "Acídico"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 4,
+   "label": "4"
+  }
+ },
+ {
+  "id": 16,
+  "nombre": "Danslezetoiles 2021",
+  "pais": "Francia",
+  "categoria": "Tinto",
+  "anio": "2021",
+  "regionNorm": "Rosellón",
+  "productora": "Es d'Aqui, Jean Louis Pinto",
+  "uva": "Cinsault 2020 (50%) y Pinot Noir 2021 (50%)\nel Cinsault está macerado en racimo entero\ndurante 10 meses en una tinaja de gres, y el Pinot Noir está despalillado a mano y macerado solo durante 15 días también en tinaja. Embotellado en Marzo 2022.\nProducción: 2.000 botellas.",
+  "uvasTags": [
+   "Pinot Noir",
+   "Cinsault"
+  ],
+  "uvasRevisar": false,
+  "notas": "En boca frutos rojos, especias y taninos suaves. Fresco,, ligero, muy jugoso y bebible.",
+  "etiquetasCata": [
+   "Fresco",
+   "Afrutado",
+   "Ligero",
+   "Especiado"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 10,
+   "label": "10"
+  }
+ },
+ {
+  "id": 17,
+  "nombre": "Les Vignes des Enfants",
+  "pais": "Francia",
+  "categoria": "Tinto",
+  "anio": "2020",
+  "regionNorm": "Ardèche",
+  "productora": "Anders Frederik Steen & Anne Bruun Blauert",
+  "uva": "Petite Syrah\n\nVino de domaine, con uva propia, de la parcella llamada \"Les Vignes des Enfants\".\nLa uva Petite Syrah o Serinne, es un cruce de la Syrah y la Peloursin.\nVinificación: despalillado y 15 días de maceración, después descubado y prensado durante 2 días, fermentó en depósito y se paso a barricas viejas para su crianza durante unos 3 años. Sin trasiegos y con 1 sólo rellenado.",
+  "uvasTags": [
+   "Petite Syrah",
+   "Syrah"
+  ],
+  "uvasRevisar": false,
+  "notas": "Fresco, complejo y profundo, definitivamente si nota la Barrica, Volatil controlada",
+  "etiquetasCata": [
+   "Fresco",
+   "Volátil"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 10,
+   "label": "10"
+  }
+ },
+ {
+  "id": 18,
+  "nombre": "InStabile Pet'Nat",
+  "pais": "España",
+  "categoria": "Burbujas",
+  "anio": "2021",
+  "regionNorm": "Priorat",
+  "productora": "Vins Nus",
+  "uva": "Garnacha blanca y Garnacha gris de un viñedo de 25 años \n\narcillas, a 650 m de altura\ninicio de fermentación alcohólica con levaduras autóctonas en depósitos de acero inoxidable, final de fermentación en la botella",
+  "uvasTags": [
+   "Garnacha Blanca",
+   "Garnacha Gris"
+  ],
+  "uvasRevisar": false,
+  "notas": "Turbio, Buena Acidez",
+  "etiquetasCata": [
+   "Acídico"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 6,
+   "label": "6"
+  }
+ },
+ {
+  "id": 19,
+  "nombre": "La Dime d'Artemis",
+  "pais": "Francia",
+  "categoria": "Blanco",
+  "anio": "2021",
+  "regionNorm": "Loira",
+  "productora": "Le Nadir,, Fabien Perreard",
+  "uva": "Chenin Blanc\n\nViña sobre suelos de gravas del plioceno en el municipio de Forges. Bajo rendimiento: 20hl/Ha.\nVinificación: lento prensado directo (24h) de ambas uvas y 18 meses de crianza en barrica vieja. Embotellado en marzo de 2023.\nProducción: 852 botellas.",
+  "uvasTags": [
+   "Chenin Blanc"
+  ],
+  "uvasRevisar": false,
+  "notas": "Mineral, Salino, Yogur",
+  "etiquetasCata": [
+   "Mineral"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 8,
+   "label": "8"
+  }
+ },
+ {
+  "id": 20,
+  "nombre": "Idó",
+  "pais": "España",
+  "categoria": "Tinto",
+  "anio": "2019",
+  "regionNorm": "Empordà",
+  "productora": "La Gutina",
+  "uva": "Garnacha Tinta\nCrianza de 12 meses en barricas",
+  "uvasTags": [
+   "Garnacha Tinta"
+  ],
+  "uvasRevisar": false,
+  "notas": "Color Rosa intenso, Fresco, Fruta Roja, Especiado",
+  "etiquetasCata": [
+   "Fresco",
+   "Afrutado",
+   "Eléctrico",
+   "Especiado"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 9,
+   "label": "9"
+  }
+ },
+ {
+  "id": 21,
+  "nombre": "Quartó",
+  "pais": "España",
+  "categoria": "Tinto",
+  "anio": "2024",
+  "regionNorm": "Mallorca",
+  "productora": "Panduro",
+  "uva": "Callet\nCrianza 6 meses en Barrica de roble\n\nHa nacido come proyecto Nomade en Murcia y Mallorca, ahora tienen una parcela en Mallorca y 10 hectares en Murcia",
+  "uvasTags": [
+   "Callet"
+  ],
+  "uvasRevisar": false,
+  "notas": "NOTAS: Tinto Legero, fruta negra, terroso",
+  "etiquetasCata": [
+   "Acídico",
+   "Afrutado"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 1,
+   "label": "1"
+  }
+ },
+ {
+  "id": 22,
+  "nombre": "Le Néant Gamay '24",
+  "pais": "Francia",
+  "categoria": "Tinto",
+  "anio": "2024",
+  "regionNorm": "Beaujolais",
+  "productora": "Maison Maenad",
+  "uva": "100% Gamay\n\nSuelo\n    granito\nVinificación\n    vendimia manual, maceración de 2 semanas con 100% racimos enteros, fermentación alcohólica con levaduras autóctonas en un depósito de acero inoxidable\nCrianza\n    12 meses en barricas de roble francés de 500 l, embotellado sin sulfitos añadidos",
+  "uvasTags": [
+   "Gamay"
+  ],
+  "uvasRevisar": false,
+  "notas": "This parcel of old vines Gamay planted over granite in the Southern Beaujolais village of Bully was the one Katie made her first wine from way back when, and so she was very excited to harvest some fruit there again last year. It spent a fortnight on the skins as whole bunches, before a year in casks, and this cooler vintage has provided a light, bright and lively wine that rivals those of the more famous crus to the north.",
+  "etiquetasCata": [
+   "Afrutado",
+   "Vibrante"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 10,
+   "label": "10"
+  }
+ },
+ {
+  "id": 23,
+  "nombre": "Parellada",
+  "pais": "España",
+  "categoria": "Orange",
+  "anio": "2023",
+  "regionNorm": "Conca de Barberà",
+  "productora": "Jordi Llorens",
+  "uva": "Parellada",
+  "uvasTags": [
+   "Parellada"
+  ],
+  "uvasRevisar": false,
+  "notas": "Orange Ligero melocoton, aromatico, floral en nariz, Buena acidez, Una primavera en boca",
+  "etiquetasCata": [
+   "Acídico",
+   "Afrutado",
+   "Ligero"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 8,
+   "label": "8"
+  }
+ },
+ {
+  "id": 24,
+  "nombre": "Terme de Laureano tinto Cariñena",
+  "pais": "España",
+  "categoria": "Tinto",
+  "anio": "2025",
+  "regionNorm": "Terra Alta",
+  "productora": "Mendall",
+  "uva": "100% Cariñena : viñas de 47 años\n\n\nSuelo\n    franco arcilloso con carácter calcáreo, 512 m de altitud, agricultura ecológica, 30 hl/ha, clima continental - mediterráneo\nVinificación\n    vendimia manual, despalillado, maceración de 32 días, fermentación alcohólica con levaduras autóctonas en depósito de acero inoxidable, fermentación maloláctica\nCrianza\n    3 meses en terracota ánfora",
+  "uvasTags": [
+   "Cariñena"
+  ],
+  "uvasRevisar": false,
+  "notas": "Evolución lenta. Vino tinto potente, sedoso y fresco.",
+  "etiquetasCata": [
+   "Fresco",
+   "Afrutado",
+   "Con cuerpo"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 1,
+   "label": "1"
+  }
+ },
+ {
+  "id": 25,
+  "nombre": "La Carallada",
+  "pais": "España",
+  "categoria": "Tinto",
+  "anio": "2020",
+  "regionNorm": "España (sin subregión)",
+  "productora": "La Furtiva",
+  "uva": "Mencia (90%) y Caiño, Souson,\nGarnacha Tintorera (10%)\ncrianza 10 meses en barricas de roble",
+  "uvasTags": [
+   "Garnacha Tintorera",
+   "Mencía",
+   "Sousón",
+   "Caíño"
+  ],
+  "uvasRevisar": false,
+  "notas": "Afrutado, complejo, buena acidez",
+  "etiquetasCata": [
+   "Acídico",
+   "Afrutado"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 9,
+   "label": "9"
+  }
+ },
+ {
+  "id": 26,
+  "nombre": "Note di Rosso 2021",
+  "pais": "Italia",
+  "categoria": "Tinto",
+  "anio": "2021",
+  "regionNorm": "Sicilia (Alcamo)",
+  "productora": "Alessandro, Viola",
+  "uva": "80% Nero d'Avola and 20% Syrah\n\non calcareous and clay soils in the Pietra Rinosa and Fastuchera districts at 400 meters elevation on Monte Bonifato. Spontaneous fermentation occurs with native yeasts in stainless steel tanks, followed by six months aging in chestnut barrels. The wine is bottled unfined and unfiltered with minimal sulfites added.",
+  "uvasTags": [
+   "Nero d'Avola",
+   "Syrah"
+  ],
+  "uvasRevisar": false,
+  "notas": "Intense ruby red color with bright clarity. The nose reveals cherry, blackberry, and purple floral notes with hints of Mediterranean herbs and black pepper. Medium-bodied palate delivers ripe red fruit with balsamic undertones, spicy crunchiness, and a fresh, taut finish reflecting Sicily's volcanic terroir.",
+  "etiquetasCata": [
+   "Fresco",
+   "Afrutado",
+   "Eléctrico",
+   "Cuerpo medio",
+   "Especiado"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 10,
+   "label": "10"
+  }
+ },
+ {
+  "id": 27,
+  "nombre": "Rio degli Sgoccioli",
+  "pais": "Italia",
+  "categoria": "Burbujas",
+  "anio": "2022",
+  "regionNorm": "Emilia-Romagna",
+  "productora": "Cinque Campi",
+  "uva": "Lambrusco Barghi\nViña vieja con suelos de silicio y arcillas, con apenas 1,5kg\nde rendimiento por planta.\nVinificación: 3 días de maceración con las pieles y crianza\ndurante 6 meses en cemento. Refermentación con un 14%\nde mosto (misma añada y refrigerado). Se guarda 8-12\nmeses antes de degüelle para que genere su propio gas.\n(Spumante, con mayor presión, máximo 6 atmósferas).\nLuego se degüella en torno a Dic. o Enero.\nProducción: 2.008 botellas",
+  "uvasTags": [
+   "Lambrusco"
+  ],
+  "uvasRevisar": false,
+  "notas": "Burbuja fina, Mineral, frambuesa, Fruita Roja",
+  "etiquetasCata": [
+   "Mineral",
+   "Afrutado"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 8,
+   "label": "8"
+  }
+ },
+ {
+  "id": 28,
+  "nombre": "KEROPATIS",
+  "pais": "Grecia",
+  "categoria": "Rosado",
+  "anio": "2023",
+  "regionNorm": "Lefkada (Islas Jónicas)",
+  "productora": "Siflogo Winery",
+  "uva": "Vertzamí\n\n\n1 día de maceración con las pieles, posterior fermentación espontánea en depósito de acero inoxidable con control suave de temperatura, desfangado y crianza durante cinco meses en depósito de acero inoxidable. Embotellado sin filtrar ni clarificar y sin adición de sulfitos ni ningún aditivo.",
+  "uvasTags": [
+   "Vertzamí"
+  ],
+  "uvasRevisar": false,
+  "notas": "Electrico y con estructura",
+  "etiquetasCata": [
+   "Eléctrico"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75 cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 8,
+   "label": "8"
+  }
+ },
+ {
+  "id": 29,
+  "nombre": "Cap à l'Ouest '21",
+  "pais": "Francia",
+  "categoria": "Burbujas",
+  "anio": "2021",
+  "regionNorm": "Loira (Vouvray)",
+  "productora": "Michel Autran",
+  "uva": "100% Chenin",
+  "uvasTags": [
+   "Chenin Blanc"
+  ],
+  "uvasRevisar": false,
+  "notas": "Michel Autran's naturally sparkling wine captures the essence of Chenin Blanc with fine bubbles and irresistible vivacity. Notes of green apple, crisp pear, and a hint of brioche accompany a refreshing, mineral palate. Perfect for a festive aperitif or with fresh oysters, it embodies the sparkling elegance of the Loire Valley terroir.",
+  "etiquetasCata": [
+   "Fresco",
+   "Mineral",
+   "Afrutado"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 7,
+   "label": "7"
+  }
+ },
+ {
+  "id": 30,
+  "nombre": "Firri Firri 2025",
+  "pais": "Italia",
+  "categoria": "Rosado",
+  "anio": "2025",
+  "regionNorm": "Sicilia (Pantelleria)",
+  "productora": "Tanca Nica",
+  "uva": "Catarratto(85%), Pignatello(10%), Inzolia(5%) \n\nSuelo\n    Volcánico de piedra ponez\nVinificación\n    Variedades vivificadas juntas, maceración de 1 día con racimo entero,\nCrianza\n    6 meses en Inox",
+  "uvasTags": [
+   "Catarratto",
+   "Pignatello (Perricone)",
+   "Ansonica (Inzolia)"
+  ],
+  "uvasRevisar": false,
+  "notas": "Mezcla típica de Pantilleria, las variedades están en la misma parcela de un viñedo de 50 años bastante fresco, orientación NE a 300m de altura. Firri Firri es la azada usada en Pantelleria para hacer el agujero (conca) que protege a las viñas del viento. Delicado, fresco pero profundo",
+  "etiquetasCata": [
+   "Fresco"
+  ],
+  "notasSinDatos": false,
+  "tamano": "75cl",
+  "coste": null,
+  "precio": 20,
+  "stock": {
+   "kind": "number",
+   "value": 3,
+   "label": "3"
+  }
+ }
+]
