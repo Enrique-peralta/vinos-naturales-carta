@@ -277,7 +277,7 @@ body.detail-open{overflow:hidden;}
 .dchips{display:flex;flex-wrap:wrap;gap:8px;}
 .dchip{background:var(--bg-subtle);color:var(--text-muted);border-radius:var(--radius-md);padding:8px 16px;}
 .dchip.empty{background:transparent;border:1px dashed var(--border-strong);color:var(--text-subtle);}
-.d-notes{color:var(--text-muted);}
+.d-notes{color:var(--text-muted);white-space:pre-line;overflow-wrap:anywhere;}
 .d-data{display:flex;justify-content:space-between;font-size:var(--fs-sm);line-height:var(--lh-sm);color:var(--text-subtle);}
 .d-data b{font-weight:500;color:var(--text);}
 .d-cta{border:0;border-radius:var(--radius-full);background:var(--bg-accent);color:var(--on-accent);font-weight:500;padding:12px 16px;}
@@ -1098,6 +1098,11 @@ function detailHtml(w){
   }
   const taste = w.etiquetasCata.length ? w.etiquetasCata.map(t=>`<span class="dchip">${esc(t)}</span>`).join("") : `<span class="dchip empty">Sin etiqueta de cata todavía</span>`;
   const grapes = (w.uvasRevisar || !w.uvasTags.length) ? `<span class="dchip empty">Uva sin confirmar</span>` : w.uvasTags.map(g=>`<span class="dchip">${esc(g)}</span>`).join("");
+  // "Notas del sumiller" = the sheet's free-text Uva cell, then its Notas cell.
+  // Each paragraph only appears when its cell has text; with neither, the whole block is left out.
+  const tidy = t => String(t||"").replace(/[ \t]+\n/g,"\n").replace(/\n[ \t]+/g,"\n").replace(/\n{3,}/g,"\n\n").trim();
+  const notesParas = [tidy(w.uva), tidy(w.notas)].filter(Boolean).map(t=>`<div class="d-notes">${esc(t)}</div>`).join("");
+  const sommelierBlock = notesParas ? `<div class="d-block"><div class="d-label">Notas del sumiller</div>${notesParas}</div>` : "";
   return `<div class="detail-inner">
     <div class="d-top">
       <button class="d-back" id="detailBack" aria-label="Volver a la carta"><span class="ic ic-20 i-chevl"></span></button>
@@ -1112,7 +1117,7 @@ function detailHtml(w){
     ${priceBlock}
     <div class="d-block"><div class="d-label">Uva</div><div class="dchips">${grapes}</div></div>
     <div class="d-block"><div class="d-label">Perfil de cata</div><div class="dchips">${taste}</div></div>
-    <div class="d-block"><div class="d-label">Notas del sumiller</div><div class="d-notes">${esc(w.notas || (w.notasSinDatos ? "Esta ficha aún no tiene notas de cata registradas." : "—"))}</div></div>
+    ${sommelierBlock}
     <div class="d-divider"></div>
     <div class="d-block"><div class="d-label">Datos</div>
       <div class="d-data"><span>Coste</span><b>${w.coste!=null?fmtPrice(w.coste)+" €":"—"}</b></div>
